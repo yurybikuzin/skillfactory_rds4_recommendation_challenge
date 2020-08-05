@@ -36,14 +36,14 @@ git clone git@github.com:yurybikuzin/skillfactory_rds4_recommendation_challenge.
 
 - [baseline-logreg.ipynb](baseline-logreg.ipynb) - адаптированный ноутбук https://www.kaggle.com/dmitriykrylov/baseline-logreg с https://www.kaggle.com/c/recommendationsv4/notebooks. Этот ноутбук, предварительно скопировав, можно взять за основу своего ноутбука
 
-## Запуск Jupyter-ноутбук в docker-контейнере
+## Запуск Jupyter-ноутбука в docker-контейнере
 
-После [установки Docker](https://docs.docker.com/engine/install/) и выполнения в случае Linux, [Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/) надо в терминале перейти в корневую папку репозитория и выполнить команду:
+После [установки Docker](https://docs.docker.com/engine/install/) (и выполнения, в случае Linux, [Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/)) надо в терминале перейти в корневую папку репозитория и выполнить команду:
 
 В Windows Command Line (`cmd`):
 
 ```
-docker run -p 8888:8888 -v %cd%:/home/jovyan/work bazawinner/dev-recommend-proj:1
+docker run -p 8888:8888 -v %cd%:/home/jovyan/work bazawinner/dev-recommend-proj:2
 ```
 
 В Windows Power Shell, macOS, linux:
@@ -79,8 +79,6 @@ Url из последней строки вывода (в приведенном
 ![Изображение Jupyter-ноутбука](assets/jupyter-notebook.png "Изображение Jupyter-ноутбука")
 
 Теперь достаточно кликнуть на папке work, чтобы увидеть содержимое корневой папки репозитория, включая доступные ноутбуки
-
-
 
 
 

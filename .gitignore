@@ -1,3 +1,5 @@
 *.sw[a-p]
 data/*.json
 data/*.csv
+*.csv
+.ipynb_checkpoints/*

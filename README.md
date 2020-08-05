@@ -1,3 +1,4 @@
+![Title PNG "Skill Factory"](/assets/skillfactory_logo.png)
 # Проект №4. Рекомендательные системы
 
 ## Задача

@@ -46,18 +46,18 @@ git clone git@github.com:yurybikuzin/skillfactory_rds4_recommendation_challenge.
 В Windows Command Line (`cmd`):
 
 ```
-docker run -m 2048m -p 8888:8888 -v %cd%:/home/jovyan/work bazawinner/dev-recommend-proj:6
+docker run -m 4096m -p 8888:8888 -v %cd%:/home/jovyan/work bazawinner/dev-recommend-proj:6
 ```
 
-В Windows Power Shell, macOS, linux:
+В Windows Power Shell, macOS:
 
 ```
-docker run -m 2048m -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:6
+docker run -m 4096m -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:6
 ```
 
-Про опцию `-m 2048m` [см. подробнее](https://stackoverflow.com/questions/43460770/docker-windows-container-memory-limit#:~:text=If%20you%20run%20docker%20containers,m%22%20option%20for%20docker%20run.)
+Про опцию `-m 4096m` [см. подробнее](https://stackoverflow.com/questions/43460770/docker-windows-container-memory-limit#:~:text=If%20you%20run%20docker%20containers,m%22%20option%20for%20docker%20run.)
 
-В macOS, linux:
+В linux:
 
 ```
 docker run -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:6

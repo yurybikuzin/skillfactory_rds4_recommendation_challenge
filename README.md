@@ -35,6 +35,9 @@ git clone git@github.com:yurybikuzin/skillfactory_rds4_recommendation_challenge.
 В корневой папке находятся все ноутбуки:
 
 - [baseline-logreg.ipynb](baseline-logreg.ipynb) - адаптированный ноутбук https://www.kaggle.com/dmitriykrylov/baseline-logreg с https://www.kaggle.com/c/recommendationsv4/notebooks. Этот ноутбук, предварительно скопировав, можно взять за основу своего ноутбука
+- [lightfm-lightgbm.ipynb](lightfm-lightgbm.ipynb) - адаптированный ноутбук https://www.kaggle.com/abdualimov/lightfm-lightgbm с https://www.kaggle.com/c/recommendationsv4/notebooks
+- [nn-collab-filter.ipynb](nn-collab-filter.ipynb) - адаптированный ноутбук https://www.kaggle.com/abdualimov/nn-collab-filter с https://www.kaggle.com/c/recommendationsv4/notebooks
+- [yurybikuzin.ipynb](yurybikuzin.ipynb) - ноутбук [yury bikuzin](https://sfdatasciencecourse.slack.com/team/U016P0Y3CP7)
 
 ## Запуск Jupyter-ноутбука в docker-контейнере
 
@@ -43,13 +46,13 @@ git clone git@github.com:yurybikuzin/skillfactory_rds4_recommendation_challenge.
 В Windows Command Line (`cmd`):
 
 ```
-docker run -m 2048m -p 8888:8888 -v %cd%:/home/jovyan/work bazawinner/dev-recommend-proj:2
+docker run -m 2048m -p 8888:8888 -v %cd%:/home/jovyan/work bazawinner/dev-recommend-proj:6
 ```
 
 В Windows Power Shell, macOS, linux:
 
 ```
-docker run -m 2048m -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:2
+docker run -m 2048m -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:6
 ```
 
 Про опцию `-m 2048m` [см. подробнее](https://stackoverflow.com/questions/43460770/docker-windows-container-memory-limit#:~:text=If%20you%20run%20docker%20containers,m%22%20option%20for%20docker%20run.)
@@ -57,7 +60,7 @@ docker run -m 2048m -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-reco
 В macOS, linux:
 
 ```
-docker run -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:2
+docker run -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:6
 ```
 
 После выполнения команды появиться подобный вывод:

@@ -1,2 +1,5 @@
 *
 !Dockerfile
+!*.py
+!*.sh
+!fix-permissions

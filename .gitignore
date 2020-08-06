@@ -3,3 +3,4 @@ data/*.json
 data/*.csv
 *.csv
 .ipynb_checkpoints/*
+model_plot.png

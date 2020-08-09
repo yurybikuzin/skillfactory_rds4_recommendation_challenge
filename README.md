@@ -60,7 +60,7 @@ docker run -m 4096m -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-reco
 В linux:
 
 ```
-docker run -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:6
+docker run -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:7
 ```
 
 После выполнения команды появиться подобный вывод:

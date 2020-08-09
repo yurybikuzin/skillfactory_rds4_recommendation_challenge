@@ -183,4 +183,10 @@ RUN pip install sklearn lightgbm seaborn keras scikit-plot pydot pydotplus
 RUN pip install pandas 
 RUN pip install numpy==1.19.0 scipy==1.4.1
 RUN pip install --use-feature=2020-resolver tensorflow 
+RUN pip install --no-binary :all: nmslib
+RUN pip install surprise
+# RUN pip install torch
+RUN pip install torch==1.6.0+cpu torchvision==0.7.0+cpu -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip install fastai
+RUN git clone https://github.com/cthurau/pymf.git && cd pymf && python setup.py install
 

@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+
+    proj:
+        container_name: ${BW_PROJ_NAME}-prov
+        image: bazawinner/dev-${BW_PROJ_NAME}-prov:${BW_DEV_PROV_VERSION}
+        entrypoint: ["docker-entrypoint.sh"]
+        working_dir: /src
+        tty: true
+        environment:
+            - TZ=Europe/Moscow
+
+            - BW_PROJ_NAME
+            - RUST_LOG=info
+        volumes:
+            - ./dev/prov/sh:/sh
+            - ./src:/src
+            - ./data:/data
+            # - ./cnf:/cnf
+            # - ./out:/out
+            - ./dev/prov/cargo-git:/usr/local/cargo/git
+            - ./dev/prov/cargo-registry:/usr/local/cargo/registry
+            - ./dev/prov/cargo-target:/src/target
+

@@ -4,3 +4,4 @@ data/*.csv
 *.csv
 .ipynb_checkpoints/*
 model_plot.png
+src/target/

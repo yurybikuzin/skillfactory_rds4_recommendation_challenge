@@ -2,3 +2,7 @@ meta_Grocery_and_Gourmet_Food.json.zip filter=lfs diff=lfs merge=lfs -text
 train.csv.zip filter=lfs diff=lfs merge=lfs -text
 sample_submission.csv.zip filter=lfs diff=lfs merge=lfs -text
 test.csv.zip filter=lfs diff=lfs merge=lfs -text
+also_view.csv.zip filter=lfs diff=lfs merge=lfs -text
+category.csv.zip filter=lfs diff=lfs merge=lfs -text
+json.csv.zip filter=lfs diff=lfs merge=lfs -text
+normalized.csv.zip filter=lfs diff=lfs merge=lfs -text

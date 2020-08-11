@@ -1,0 +1,43 @@
+[package]
+name = "provide"
+version = "0.1.0"
+authors = ["Yury Bikuzin <yury.bikuzin@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+log = "0.4"
+anyhow = "1.0"
+structopt = "0.3.15"
+config = "0.10.1"
+
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0.55"
+
+pretty_env_logger = "0.4"
+tokio = { version = "0.2", features = ["rt-threaded", "macros", "fs"] }
+indicatif = "0.15.0"
+# chrono = "0.4.11"
+# # ansi-escapes = "0.1"
+# uuid = { version = "0.8", features = ["v4"] }
+#
+# env = { path = "../env" }
+# term = { path = "../term" }
+# auth = { path = "../auth" }
+# diaps = { path = "../diaps" }
+# diap_store = { path = "../diap_store" }
+# ids = { path = "../ids" }
+# id_store = { path = "../id_store" }
+arrange_millis = { path = "../arrange_millis" }
+# cards = { path = "../cards" }
+# collect = { path = "../collect" }
+# to_csv = { path = "../to_csv" }
+# client = { path = "../client" }
+# rmq = { path = "../rmq" }
+# settings = { path = "../settings" }
+# autocatalog = { path = "../autocatalog" }
+# record = { path = "../record" }
+csv = "1.1"
+regex = "1.3.9"
+lazy_static = "1.4.0"

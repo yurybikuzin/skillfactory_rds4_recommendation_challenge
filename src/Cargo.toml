@@ -1,0 +1,6 @@
+[workspace]
+default-members = [ "provide" ]
+members = [ 
+    "provide",
+]
+

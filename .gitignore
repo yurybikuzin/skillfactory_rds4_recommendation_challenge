@@ -1,7 +1,7 @@
 *.sw[a-p]
 data/*.json
-data/*.csv
 *.csv
+!data/itemid_asin.csv
 .ipynb_checkpoints/*
 model_plot.png
 src/target/

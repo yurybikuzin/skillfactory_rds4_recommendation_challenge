@@ -1,0 +1,3 @@
+[submodule "src/bytes"]
+	path = src/bytes
+	url = https://github.com/tokio-rs/bytes.git

@@ -6,3 +6,7 @@ also_view.csv.zip filter=lfs diff=lfs merge=lfs -text
 category.csv.zip filter=lfs diff=lfs merge=lfs -text
 json.csv.zip filter=lfs diff=lfs merge=lfs -text
 normalized.csv.zip filter=lfs diff=lfs merge=lfs -text
+also_view_used.csv.zip filter=lfs diff=lfs merge=lfs -text
+category_used.csv.zip filter=lfs diff=lfs merge=lfs -text
+normalized_used.csv.zip filter=lfs diff=lfs merge=lfs -text
+itemid_asin.csv filter=lfs diff=lfs merge=lfs -text

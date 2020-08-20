@@ -36,6 +36,7 @@ itemid_asin_test = test[['itemid', 'asin']]
 itemid_asin = itemid_asin.drop_duplicates().reset_index(drop = True)
 itemid_asin_test = itemid_asin_test.drop_duplicates().reset_index(drop = True)
 itemid_asin_concat = pd.concat([itemid_asin, itemid_asin_test]).drop_duplicates().reset_index(drop = True)
+itemid_asin_concat.to_csv('data/itemid_asin.csv')
 ```
 
 

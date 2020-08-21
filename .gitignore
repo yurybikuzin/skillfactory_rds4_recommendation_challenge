@@ -2,6 +2,7 @@
 data/*.json
 *.csv
 !data/itemid_asin.csv
+!data/itemid_asin_train.csv
 .ipynb_checkpoints/*
 model_plot.png
 target/

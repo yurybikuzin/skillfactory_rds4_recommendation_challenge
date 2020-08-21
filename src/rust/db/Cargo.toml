@@ -1,5 +1,5 @@
 [package]
-name = "provide"
+name = "db"
 version = "0.1.0"
 authors = ["Yury Bikuzin <yury.bikuzin@gmail.com>"]
 edition = "2018"
@@ -20,4 +20,8 @@ tokio = { version = "0.2", features = ["rt-threaded", "macros", "fs"] }
 indicatif = "0.15.0"
 zip = "0.5.6"
 arrange_millis = { path = "../arrange_millis" }
+json = { path = "../json" }
 csv = "1.1"
+rusqlite = "0.23"
+lazy_static = "1.4"
+regex = "1"

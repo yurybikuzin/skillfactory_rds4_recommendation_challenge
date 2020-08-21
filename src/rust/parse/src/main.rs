@@ -156,10 +156,7 @@ macro_rules! save_csv {
         }
         wtr.flush()?;
 
-        // let mut filepath = $data_dir.clone();
-        // filepath.push(format!("{}.zip", &filename));
-
-        let filename = format!("{}.csv", $filename);
+        let filename = format!("{}.csv.zip", $filename);
         let filepath = get_filepath(&$data_dir, &filename);
         let file = std::fs::File::create(&filepath).unwrap();
         let mut zip = zip::ZipWriter::new(file);
@@ -169,6 +166,7 @@ macro_rules! save_csv {
         zip.start_file(filename, options)?;
         zip.write_all(&buf.vec.read().unwrap())?;
         zip.finish()?;
+        println!("written: {:?}", filepath);
     };
 }
 
@@ -198,6 +196,8 @@ fn get_filepath(data_dir: &PathBuf, filename: &str) -> PathBuf {
     filepath.push(filename);
     filepath
 }
+
+use rusqlite::{Connection, NO_PARAMS};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -373,7 +373,7 @@ async fn main() -> Result<()> {
         category_is_train_count,
         vec_also_view_used.len(),
         also_view_is_train_count,
-    );
+        );
 
     let start = std::time::Instant::now();
 
@@ -385,8 +385,17 @@ async fn main() -> Result<()> {
     save_csv!(data_dir, vec_category_used);
     save_csv!(data_dir, vec_also_view_used);
 
+    let filepath = get_filepath(&data_dir, "flask.db");
+    let conn = rusqlite::Connection::open(&filepath).context(format!("{:?}", filepath))?;
+    let sql = "
+        create table data {
+            itemid,
+        }
+    ";
+    conn.execute(sql, NO_PARAMS).context(sql)?;
+
     println!(
-        "write *.csv.zip: {}",
+        "write *.csv.zip took {}",
         arrange_millis::get(std::time::Instant::now().duration_since(start).as_millis())
     );
     println!(

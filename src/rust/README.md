@@ -79,3 +79,24 @@ timing total: 31.951s
 
 [Подробное описание](../data/README.md)
 
+## Troubleshooting
+
+
+### `error: linking with cc` while `cargo run -p db`
+
+```
+error: linking with `cc` failed: exit code: 1
+```
+
+https://github.com/rust-lang/rust/issues/25289 gives an answer:
+
+```
+sudo apt install -y gcc-multilib
+```
+
+but this solves problem:
+
+```
+sudo apt-get install -y libsqlite3-dev
+```
+

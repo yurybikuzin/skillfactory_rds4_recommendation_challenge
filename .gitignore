@@ -4,4 +4,5 @@ data/*.json
 !data/itemid_asin.csv
 .ipynb_checkpoints/*
 model_plot.png
-src/target/
+target/
+__pycache__/

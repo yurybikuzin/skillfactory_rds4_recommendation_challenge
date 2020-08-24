@@ -1,25 +1,58 @@
-// fn main() {
-//     println!("Hello, world!");
-// }
-// #![recursion_limit="4096"]
+#![recursion_limit = "4096"]
+
 #[allow(unused_imports)]
 use anyhow::{anyhow, bail, Context, Error, Result};
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
-use std::path::PathBuf;
-use structopt::StructOpt;
-// use std::fs;
 use json::Json;
-use std::fs::File;
-use std::io::prelude::*;
-use std::io::BufReader;
-//
+use regex::Regex;
+// use rusqlite::{Connection, NO_PARAMS};
+use indicatif::{ProgressBar, ProgressStyle};
+use itertools::Itertools;
+use seq_macro::seq;
+use serde::{Deserialize, Serialize};
+use std::{
+    collections::{HashMap, HashSet},
+    fs::File,
+    io::prelude::*,
+    io::BufReader,
+    path::{Path, PathBuf},
+};
+use structopt::StructOpt;
+
+#[macro_use]
+extern crate diesel;
+use diesel::RunQueryDsl;
+extern crate dotenv;
+mod db;
+
 #[derive(Debug, StructOpt)]
 struct Opt {
     /// Path to toml config file
     #[structopt(parse(from_os_str), default_value = "../../data")]
     data: PathBuf,
+}
+
+pub struct RecordTrain {
+    pub id: i32,
+    pub overall: i32,
+    pub verified: i32,
+    pub unix_review_time: i32,
+    pub reviewer_name_id: Option<i32>,
+    pub summary_id: Option<i32>,
+    pub vote: Option<i32>,
+    // pub style: Option<String>,
+    // pub image: Option<String>,
+    pub userid: i32,
+    pub itemid: i32,
+    pub rating: i32,
+}
+
+pub struct RecordImage {
+    pub id: i32,
+    pub train_id: i32,
+    pub image_id: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -29,7 +62,7 @@ pub struct ItemIdAsin {
 }
 
 pub struct RecordItemIdAsin {
-    pub itemid: u16,
+    pub itemid: i32,
     pub asin: String,
 }
 
@@ -41,9 +74,9 @@ pub struct AlsoViewUsed {
 }
 
 pub struct RecordAlsoView {
-    pub itemid: u16,
-    pub also_view_itemid: u16,
-    pub is_train: bool,
+    pub itemid: i32,
+    pub also_view_itemid: i32,
+    pub is_train: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -54,9 +87,9 @@ pub struct CategoryUsed {
 }
 
 pub struct RecordCategory {
-    pub itemid: u16,
-    pub category_id: u16,
-    pub is_train: bool,
+    pub itemid: i32,
+    pub category_id: i32,
+    pub is_train: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -75,44 +108,56 @@ pub struct Train {
     pub rating: f64,
 }
 
-pub struct RecordTrain {
-    pub overall: u8,
-    pub verified: bool,
-    pub unix_review_time_truncated: u32,
-    pub reviewer_name_id: Option<u32>,
-    pub summary_id: Option<u32>,
-    pub vote: Option<u16>,
-    // pub style: Option<String>,
-    // pub image: Option<String>,
-    pub userid: u32,
-    pub itemid: u16,
-    pub rating: u8,
-}
-
-pub struct RecordImage {
-    pub itemid: u16,
-    pub image_id: u16,
-}
-
-use serde::{Deserialize, Serialize};
-
 macro_rules! normalize {
-    ($value:expr => $type:ty, $map:ident) => {{
+    ($value:expr, $map:ident) => {{
         if let Some(id) = $map.get(&$value) {
-            *id as $type
+            *id as i32
         } else {
-            let id = $map.len() as $type;
-            $map.insert($value.clone(), id);
-            id
+            let id = $map.len();
+            $map.insert($value.clone(), id as i32);
+            id as i32
         }
     }};
 }
 
 macro_rules! normalize_opt {
-    ($value:expr => $type:ty, $map:ident) => {
-        $value.map(|s| {
-            normalize!(s => $type, $map)
-        })
+    ($value:expr, $map:ident) => {
+        $value.map(|s| normalize!(s, $map))
+    };
+}
+
+macro_rules! insert_into {
+    ($table:expr, $conn:expr, $source:expr, $type:ty, $block:block) => {
+        {
+            let pbar = ProgressBar::new($source.len() as u64);
+            pbar.set_style(
+                ProgressStyle::default_bar()
+                .template("{elapsed_precise}/{eta_precise} [{bar:60.cyan/blue}] {pos}/{len} {wide_msg}")
+                .progress_chars("=>-"),
+            );
+            pbar.enable_steady_tick(125);
+            pbar.println(format!("insert into {} . . .", stringify!($table)));
+            let chunk_size = 256; // обеспечивает минимальное значения (время компяляции + время выполнения)
+            for chunk in &$source.into_iter().chunks(chunk_size) {
+                let mut vec_new = Vec::<$type>::new();
+
+                let vec_chunk = chunk.collect::<Vec<_>>();
+
+                seq!(i in 0..256 {
+                    if vec_chunk.len() > i {
+
+                        let new_rec = $block;
+                        vec_new.push(new_rec);
+                    };
+                });
+                diesel::insert_into($table)
+                    .values(&vec_new)
+                    .execute(&$conn)
+                    .context(format!("insert into {}", stringify!($table)))?;
+                pbar.inc(vec_chunk.len() as u64);
+            }
+            pbar.finish();
+        }
     };
 }
 
@@ -128,17 +173,14 @@ pub struct NormalizedUsed {
 }
 
 pub struct RecordItem {
-    pub itemid: u16,
-    pub brand_id: Option<u16>,
-    pub description_id: Option<u16>,
-    pub title_id: Option<u16>,
-    pub main_cat_id: Option<u8>,
-    pub price_id: Option<u16>,
+    pub itemid: i32,
+    pub brand_id: Option<i32>,
+    pub description_id: Option<i32>,
+    pub title_id: Option<i32>,
+    pub main_cat_id: Option<i32>,
+    pub price_id: Option<i32>,
 }
 
-use std::collections::{HashMap, HashSet};
-
-use regex::Regex;
 #[tokio::main]
 async fn main() -> Result<()> {
     let start_total = std::time::Instant::now();
@@ -151,27 +193,179 @@ async fn main() -> Result<()> {
         let data_dir = PathBuf::from(&opt.data);
 
         {
+            let filepath = get_filepath(&data_dir, "train.csv.zip");
+            let contents = unzip(&filepath).context(format!("{:?}", filepath))?;
+            {
+                let start = std::time::Instant::now();
+                let buffered_reader = BufReader::new(contents.as_bytes());
+                let mut dic_reviewer_name = HashMap::<String, i32>::new();
+                let mut dic_summary = HashMap::<String, i32>::new();
+                let mut dic_image = HashMap::<String, i32>::new();
+                let mut vec_main = Vec::<RecordTrain>::new();
+                let mut vec_image = Vec::<RecordImage>::new();
+                let mut rdr = csv::Reader::from_reader(buffered_reader);
+                let mut style_keys = HashSet::new();
+                for (i, result) in rdr.deserialize().enumerate() {
+                    let record: Train = result?;
+                    let itemid = record.itemid as i32;
+                    let userid = record.userid as i32;
+                    let rating = record.rating as i32;
+                    let overall = record.overall as i32;
+                    let verified: i32 = if record.verified == "True" { 1 } else { 0 };
+                    let unix_review_time = record.unix_review_time as i32;
+                    let reviewer_name_id = normalize_opt!(record.reviewer_name, dic_reviewer_name);
+                    let summary_id = normalize_opt!(record.summary, dic_summary);
+                    let vote = if let Some(vote) = record.vote {
+                        lazy_static::lazy_static! {
+                            static ref RE_COMMA: Regex = Regex::new(",").unwrap();
+                        }
+                        let vote = RE_COMMA.replace_all(&vote, "").to_string();
+                        Some(vote.parse::<i32>().context(vote)?)
+                    } else {
+                        None
+                    };
+                    if let Some(style) = record.style {
+                        parse_style(&style, &mut style_keys, i)?;
+                    }
+                    let id = vec_main.len() as i32;
+                    if let Some(image) = record.image {
+                        let train_id = id;
+                        lazy_static::lazy_static! {
+                            static ref RE_QUOTE: Regex = Regex::new("'").unwrap();
+                        }
+                        let image = RE_QUOTE.replace_all(&image, "\"").to_string();
+
+                        let json = Json::from_str(&image, format!("[{}].image", i))?;
+                        for image in json.iter_vec().context("json.iter_vec()")? {
+                            if let Ok(image) = image.as_string() {
+                                let image_id = normalize!(image, dic_image);
+                                let id = vec_image.len() as i32;
+                                vec_image.push(RecordImage {
+                                    id,
+                                    train_id,
+                                    image_id,
+                                });
+                            }
+                        }
+                    }
+                    vec_main.push(RecordTrain {
+                        id,
+                        overall,
+                        verified,
+                        unix_review_time,
+                        reviewer_name_id,
+                        summary_id,
+                        vote,
+                        userid,
+                        itemid,
+                        rating,
+                    });
+                }
+                println!(
+                    "{}, vec_main: {}, images: {}, style_key: {:?}",
+                    arrange_millis::get(
+                        std::time::Instant::now().duration_since(start).as_millis()
+                    ),
+                    vec_main.len(),
+                    dic_image.len(),
+                    style_keys,
+                );
+
+                let conn = db::establish_connection();
+
+                insert_into!(
+                    db::dic_reviewer_name::table,
+                    conn,
+                    dic_reviewer_name,
+                    db::NewDicReviewerName,
+                    {
+                        db::NewDicReviewerName {
+                            id: &vec_chunk[i].1,
+                            value: vec_chunk[i].0.as_str(),
+                        }
+                    }
+                );
+
+                insert_into!(
+                    db::dic_summary::table,
+                    conn,
+                    dic_summary,
+                    db::NewDicSummary,
+                    {
+                        db::NewDicSummary {
+                            id: &vec_chunk[i].1,
+                            value: vec_chunk[i].0.as_str(),
+                        }
+                    }
+                );
+
+                insert_into!(db::dic_image::table, conn, dic_image, db::NewDicImage, {
+                    db::NewDicImage {
+                        id: &vec_chunk[i].1,
+                        value: vec_chunk[i].0.as_str(),
+                    }
+                });
+
+                insert_into!(db::image::table, conn, vec_image, db::NewImage, {
+                    db::NewImage {
+                        id: &vec_chunk[i].id,
+                        train_id: &vec_chunk[i].train_id,
+                        image_id: &vec_chunk[i].image_id,
+                    }
+                });
+
+                insert_into!(db::train::table, conn, vec_main, db::NewTrain, {
+                    db::NewTrain {
+                        id: &vec_chunk[i].id,
+                        userid: &vec_chunk[i].userid,
+                        itemid: &vec_chunk[i].itemid,
+                        rating: &vec_chunk[i].rating,
+                        overall: &vec_chunk[i].overall,
+                        verified: &vec_chunk[i].verified,
+                        unix_review_time: &vec_chunk[i].unix_review_time,
+                        reviewer_name_id: if let Some(v) = &vec_chunk[i].reviewer_name_id {
+                            Some(v)
+                        } else {
+                            None
+                        },
+                        summary_id: if let Some(v) = &vec_chunk[i].summary_id {
+                            Some(v)
+                        } else {
+                            None
+                        },
+                        vote: if let Some(v) = &vec_chunk[i].vote {
+                            Some(v)
+                        } else {
+                            None
+                        },
+                    }
+                });
+            }
+        }
+
+        {
             let filepath = get_filepath(&data_dir, "normalized_used.csv.zip");
             let contents = unzip(&filepath).context(format!("{:?}", filepath))?;
             {
                 let start = std::time::Instant::now();
-                let mut brands = HashMap::<String, u16>::new();
-                let mut descriptions = HashMap::<String, u16>::new();
-                let mut prices = HashMap::<String, u16>::new();
-                let mut titles = HashMap::<String, u16>::new();
-                let mut main_cats = HashMap::<String, u8>::new();
+                let mut brands = HashMap::<String, i32>::new();
+                let mut descriptions = HashMap::<String, i32>::new();
+                let mut prices = HashMap::<String, i32>::new();
+                let mut titles = HashMap::<String, i32>::new();
+                let mut main_cats = HashMap::<String, i32>::new();
                 let mut vec_main = Vec::<RecordItem>::new();
                 let buffered_reader = BufReader::new(contents.as_bytes());
                 let mut rdr = csv::Reader::from_reader(buffered_reader);
                 for result in rdr.deserialize() {
                     let record: NormalizedUsed = result?;
-                    let brand_id = normalize_opt!(record.brand => u16, brands);
-                    let description_id = normalize_opt!(record.description => u16, descriptions);
-                    let price_id = normalize_opt!(record.price => u16, prices);
-                    let title_id = normalize_opt!(record.title => u16, titles);
-                    let main_cat_id = normalize_opt!(record.main_cat => u8, main_cats);
+                    let brand_id = normalize_opt!(record.brand, brands);
+                    let description_id = normalize_opt!(record.description, descriptions);
+                    let price_id = normalize_opt!(record.price, prices);
+                    let title_id = normalize_opt!(record.title, titles);
+                    let main_cat_id = normalize_opt!(record.main_cat, main_cats);
+                    let itemid = record.itemid as i32;
                     vec_main.push(RecordItem {
-                        itemid: record.itemid as u16,
+                        itemid,
                         brand_id,
                         description_id,
                         price_id,
@@ -180,11 +374,11 @@ async fn main() -> Result<()> {
                     });
                 }
                 println!(
-                    "{}, vec_record: {}, brands: {}, descriptions: {}, prices: {}, titles: {}, main_cats: {}",
+                        "{}, vec_record: {}, brands: {}, descriptions: {}, prices: {}, titles: {}, main_cats: {}",
 
-                    arrange_millis::get(std::time::Instant::now().duration_since(start).as_millis()),
-                    vec_main.len(), brands.len(), descriptions.len(), prices.len(), titles.len(), main_cats.len()
-                    );
+                        arrange_millis::get(std::time::Instant::now().duration_since(start).as_millis()),
+                        vec_main.len(), brands.len(), descriptions.len(), prices.len(), titles.len(), main_cats.len()
+                        );
             }
         }
 
@@ -198,7 +392,7 @@ async fn main() -> Result<()> {
             let mut rdr = csv::Reader::from_reader(buffered_reader);
             for result in rdr.deserialize() {
                 let record: ItemIdAsin = result.context("ItemIdAsin")?;
-                let itemid = record.itemid as u16;
+                let itemid = record.itemid as i32;
                 let asin = record.asin;
                 vec_main.push(RecordItemIdAsin { itemid, asin })
             }
@@ -219,9 +413,9 @@ async fn main() -> Result<()> {
                 let mut rdr = csv::Reader::from_reader(buffered_reader);
                 for result in rdr.deserialize() {
                     let record: AlsoViewUsed = result.context("AlsoViewUsed")?;
-                    let itemid = record.itemid as u16;
-                    let also_view_itemid = record.also_view_itemid as u16;
-                    let is_train = record.is_train;
+                    let itemid = record.itemid as i32;
+                    let also_view_itemid = record.also_view_itemid as i32;
+                    let is_train = record.is_train as i32;
                     vec_main.push(RecordAlsoView {
                         itemid,
                         also_view_itemid,
@@ -243,15 +437,15 @@ async fn main() -> Result<()> {
             let contents = unzip(&filepath).context(format!("{:?}", filepath))?;
             {
                 let start = std::time::Instant::now();
-                let mut categorys = HashMap::<String, u16>::new();
+                let mut dic_category = HashMap::<String, i32>::new();
                 let mut vec_main = Vec::<RecordCategory>::new();
                 let buffered_reader = BufReader::new(contents.as_bytes());
                 let mut rdr = csv::Reader::from_reader(buffered_reader);
                 for result in rdr.deserialize() {
                     let record: CategoryUsed = result.context("")?;
-                    let itemid = record.itemid as u16;
-                    let is_train = record.is_train;
-                    let category_id = normalize!(record.category => u16, categorys);
+                    let itemid = record.itemid as i32;
+                    let is_train = if record.is_train { 1 } else { 0 };
+                    let category_id = normalize!(record.category, dic_category);
                     vec_main.push(RecordCategory {
                         itemid,
                         category_id,
@@ -264,82 +458,7 @@ async fn main() -> Result<()> {
                         std::time::Instant::now().duration_since(start).as_millis(),
                     ),
                     vec_main.len(),
-                    categorys.len(),
-                );
-            }
-        }
-
-        {
-            let filepath = get_filepath(&data_dir, "train.csv.zip");
-            let contents = unzip(&filepath).context(format!("{:?}", filepath))?;
-            {
-                let start = std::time::Instant::now();
-                let buffered_reader = BufReader::new(contents.as_bytes());
-                let mut reviewer_names = HashMap::<String, u32>::new();
-                let mut summarys = HashMap::<String, u32>::new();
-                let mut images = HashMap::<String, u16>::new();
-                let mut vec_main = Vec::<RecordTrain>::new();
-                let mut vec_image = Vec::<RecordImage>::new();
-                let mut rdr = csv::Reader::from_reader(buffered_reader);
-                let mut style_keys = HashSet::new();
-                for (i, result) in rdr.deserialize().enumerate() {
-                    let record: Train = result?;
-                    let itemid = record.itemid as u16;
-                    let userid = record.userid as u32;
-                    let rating = record.rating as u8;
-                    let overall = record.overall as u8;
-                    let verified = record.verified == "True";
-                    let unix_review_time_truncated = (record.unix_review_time / 100) as u32;
-                    let reviewer_name_id =
-                        normalize_opt!(record.reviewer_name => u32, reviewer_names);
-                    let summary_id = normalize_opt!(record.summary => u32, summarys);
-                    let vote = if let Some(vote) = record.vote {
-                        lazy_static::lazy_static! {
-                            static ref RE_COMMA: Regex = Regex::new(",").unwrap();
-                        }
-                        let vote = RE_COMMA.replace_all(&vote, "").to_string();
-                        Some(vote.parse::<u16>().context(vote)?)
-                    } else {
-                        None
-                    };
-                    if let Some(style) = record.style {
-                        parse_style(&style, &mut style_keys, i)?;
-                    }
-                    if let Some(image) = record.image {
-                        lazy_static::lazy_static! {
-                            static ref RE_QUOTE: Regex = Regex::new("'").unwrap();
-                        }
-                        let image = RE_QUOTE.replace_all(&image, "\"").to_string();
-
-                        let json = Json::from_str(&image, format!("[{}].image", i))?;
-                        for image in json.iter_vec().context("json.iter_vec()")? {
-                            if let Ok(image) = image.as_string() {
-                                let image_id = normalize!(image => u16, images);
-
-                                vec_image.push(RecordImage { itemid, image_id });
-                            }
-                        }
-                    }
-                    vec_main.push(RecordTrain {
-                        overall,
-                        verified,
-                        unix_review_time_truncated,
-                        reviewer_name_id,
-                        summary_id,
-                        vote,
-                        userid,
-                        itemid,
-                        rating,
-                    });
-                }
-                println!(
-                    "{}, vec_main: {}, images: {}, style_key: {:?}",
-                    arrange_millis::get(
-                        std::time::Instant::now().duration_since(start).as_millis()
-                    ),
-                    vec_main.len(),
-                    images.len(),
-                    style_keys,
+                    dic_category.len(),
                 );
             }
         }
@@ -406,18 +525,8 @@ fn parse_style(style: &str, style_keys: &mut HashSet<String>, i: usize) -> Resul
     for (key, _) in json.iter_map().context("json.iter_map()")? {
         style_keys.insert(key.to_owned());
     }
-    // if style_keys.len() > 0 {
-    //     bail!(
-    //         "orig: {}, json: {}",
-    //         style_orig,
-    //         serde_json::to_string_pretty(&json.value).unwrap()
-    //     );
-    // }
     Ok(())
 }
-
-// use rusqlite::{Connection, NO_PARAMS};
-use std::path::Path;
 
 fn unzip(filepath: &Path) -> Result<String> {
     let start = std::time::Instant::now();

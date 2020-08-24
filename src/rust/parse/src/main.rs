@@ -197,8 +197,9 @@ fn get_filepath(data_dir: &PathBuf, filename: &str) -> PathBuf {
     filepath
 }
 
-use rusqlite::{Connection, NO_PARAMS};
+// use rusqlite::{Connection, NO_PARAMS};
 
+use itertools::Itertools;
 #[tokio::main]
 async fn main() -> Result<()> {
     let start_total = std::time::Instant::now();

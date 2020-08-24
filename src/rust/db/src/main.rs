@@ -5,11 +5,10 @@ use anyhow::{anyhow, bail, Context, Error, Result};
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
-use json::Json;
-use regex::Regex;
-// use rusqlite::{Connection, NO_PARAMS};
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
+use json::Json;
+use regex::Regex;
 use seq_macro::seq;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -74,6 +73,7 @@ pub struct AlsoViewUsed {
 }
 
 pub struct RecordAlsoView {
+    pub id: i32,
     pub itemid: i32,
     pub also_view_itemid: i32,
     pub is_train: i32,
@@ -87,6 +87,7 @@ pub struct CategoryUsed {
 }
 
 pub struct RecordCategory {
+    pub id: i32,
     pub itemid: i32,
     pub category_id: i32,
     pub is_train: i32,
@@ -106,6 +107,16 @@ pub struct Train {
     pub userid: u64,
     pub itemid: u64,
     pub rating: f64,
+}
+
+macro_rules! opt_ref {
+    ($source:expr) => {
+        if let Some(v) = &$source {
+            Some(v)
+        } else {
+            None
+        }
+    };
 }
 
 macro_rules! normalize {
@@ -134,7 +145,7 @@ macro_rules! insert_into {
                 ProgressStyle::default_bar()
                 .template("{elapsed_precise}/{eta_precise} [{bar:60.cyan/blue}] {pos}/{len} {wide_msg}")
                 .progress_chars("=>-"),
-            );
+                );
             pbar.enable_steady_tick(125);
             pbar.println(format!("insert into {} . . .", stringify!($table)));
             let chunk_size = 256; // обеспечивает минимальное значения (время компяляции + время выполнения)
@@ -178,7 +189,8 @@ pub struct RecordItem {
     pub description_id: Option<i32>,
     pub title_id: Option<i32>,
     pub main_cat_id: Option<i32>,
-    pub price_id: Option<i32>,
+    pub price: Option<i32>,
+    pub is_train: i32,
 }
 
 #[tokio::main]
@@ -191,6 +203,7 @@ async fn main() -> Result<()> {
     {
         let opt = Opt::from_args();
         let data_dir = PathBuf::from(&opt.data);
+        let conn = db::establish_connection();
 
         {
             let filepath = get_filepath(&data_dir, "train.csv.zip");
@@ -271,8 +284,6 @@ async fn main() -> Result<()> {
                     style_keys,
                 );
 
-                let conn = db::establish_connection();
-
                 insert_into!(
                     db::dic_reviewer_name::table,
                     conn,
@@ -323,21 +334,9 @@ async fn main() -> Result<()> {
                         overall: &vec_chunk[i].overall,
                         verified: &vec_chunk[i].verified,
                         unix_review_time: &vec_chunk[i].unix_review_time,
-                        reviewer_name_id: if let Some(v) = &vec_chunk[i].reviewer_name_id {
-                            Some(v)
-                        } else {
-                            None
-                        },
-                        summary_id: if let Some(v) = &vec_chunk[i].summary_id {
-                            Some(v)
-                        } else {
-                            None
-                        },
-                        vote: if let Some(v) = &vec_chunk[i].vote {
-                            Some(v)
-                        } else {
-                            None
-                        },
+                        reviewer_name_id: opt_ref!(vec_chunk[i].reviewer_name_id),
+                        summary_id: opt_ref!(vec_chunk[i].summary_id),
+                        vote: opt_ref!(vec_chunk[i].vote),
                     }
                 });
             }
@@ -348,37 +347,117 @@ async fn main() -> Result<()> {
             let contents = unzip(&filepath).context(format!("{:?}", filepath))?;
             {
                 let start = std::time::Instant::now();
-                let mut brands = HashMap::<String, i32>::new();
-                let mut descriptions = HashMap::<String, i32>::new();
-                let mut prices = HashMap::<String, i32>::new();
-                let mut titles = HashMap::<String, i32>::new();
-                let mut main_cats = HashMap::<String, i32>::new();
+                let mut dic_brand = HashMap::<String, i32>::new();
+                let mut dic_description = HashMap::<String, i32>::new();
+                let mut dic_title = HashMap::<String, i32>::new();
+                let mut dic_main_cat = HashMap::<String, i32>::new();
                 let mut vec_main = Vec::<RecordItem>::new();
+                let mut set_itemid = HashSet::<i32>::new();
                 let buffered_reader = BufReader::new(contents.as_bytes());
                 let mut rdr = csv::Reader::from_reader(buffered_reader);
+                let mut count = 0;
                 for result in rdr.deserialize() {
                     let record: NormalizedUsed = result?;
-                    let brand_id = normalize_opt!(record.brand, brands);
-                    let description_id = normalize_opt!(record.description, descriptions);
-                    let price_id = normalize_opt!(record.price, prices);
-                    let title_id = normalize_opt!(record.title, titles);
-                    let main_cat_id = normalize_opt!(record.main_cat, main_cats);
+                    let brand_id = normalize_opt!(record.brand, dic_brand);
+                    let description_id = normalize_opt!(record.description, dic_description);
+                    let price = if let Some(price) = record.price {
+                        lazy_static::lazy_static! {
+                            static ref RE: Regex = Regex::new(r#"^\$(\d+)\.(\d\d)"#).unwrap();
+                        }
+                        let caps = RE
+                            .captures(&price)
+                            .ok_or_else(|| anyhow!("price: {}", price))?;
+                        let before_dot = caps.get(1).unwrap().as_str();
+                        let after_dot = caps.get(2).unwrap().as_str();
+                        let price = 100 as i32
+                            * before_dot
+                                .parse::<u16>()
+                                .context(format!("{}", before_dot))?
+                                as i32
+                            + after_dot.parse::<u8>().context(format!("{}", after_dot))? as i32;
+                        Some(price)
+                    } else {
+                        None
+                    };
+                    let title_id = normalize_opt!(record.title, dic_title);
+                    let main_cat_id = normalize_opt!(record.main_cat, dic_main_cat);
                     let itemid = record.itemid as i32;
-                    vec_main.push(RecordItem {
-                        itemid,
-                        brand_id,
-                        description_id,
-                        price_id,
-                        title_id,
-                        main_cat_id,
-                    });
+                    let is_train = if record.is_train { 1 } else { 0 };
+                    if set_itemid.contains(&itemid) {
+                        warn!("itemid: {}", itemid);
+                        count += 1;
+                    } else {
+                        set_itemid.insert(itemid);
+                        vec_main.push(RecordItem {
+                            itemid,
+                            brand_id,
+                            description_id,
+                            title_id,
+                            main_cat_id,
+                            price,
+                            is_train,
+                        });
+                    }
                 }
                 println!(
-                        "{}, vec_record: {}, brands: {}, descriptions: {}, prices: {}, titles: {}, main_cats: {}",
+                    "{}, count: {}, vec_record: {}, dic_brand: {}, dic_description: {}, dic_title: {}, dic_main_cat: {}",
 
-                        arrange_millis::get(std::time::Instant::now().duration_since(start).as_millis()),
-                        vec_main.len(), brands.len(), descriptions.len(), prices.len(), titles.len(), main_cats.len()
-                        );
+                    arrange_millis::get(std::time::Instant::now().duration_since(start).as_millis()),
+                    count,
+                    vec_main.len(), dic_brand.len(), dic_description.len(), dic_title.len(), dic_main_cat.len()
+                    );
+
+                insert_into!(db::dic_brand::table, conn, dic_brand, db::NewDicBrand, {
+                    db::NewDicBrand {
+                        id: &vec_chunk[i].1,
+                        value: vec_chunk[i].0.as_str(),
+                    }
+                });
+
+                insert_into!(
+                    db::dic_description::table,
+                    conn,
+                    dic_description,
+                    db::NewDicDescription,
+                    {
+                        db::NewDicDescription {
+                            id: &vec_chunk[i].1,
+                            value: vec_chunk[i].0.as_str(),
+                        }
+                    }
+                );
+
+                insert_into!(db::dic_title::table, conn, dic_title, db::NewDicTitle, {
+                    db::NewDicTitle {
+                        id: &vec_chunk[i].1,
+                        value: vec_chunk[i].0.as_str(),
+                    }
+                });
+
+                insert_into!(
+                    db::dic_main_cat::table,
+                    conn,
+                    dic_main_cat,
+                    db::NewDicMainCat,
+                    {
+                        db::NewDicMainCat {
+                            id: &vec_chunk[i].1,
+                            value: vec_chunk[i].0.as_str(),
+                        }
+                    }
+                );
+
+                insert_into!(db::item::table, conn, vec_main, db::NewItem, {
+                    db::NewItem {
+                        itemid: &vec_chunk[i].itemid,
+                        brand_id: opt_ref!(vec_chunk[i].brand_id),
+                        description_id: opt_ref!(vec_chunk[i].description_id),
+                        title_id: opt_ref!(vec_chunk[i].title_id),
+                        main_cat_id: opt_ref!(vec_chunk[i].main_cat_id),
+                        price: opt_ref!(vec_chunk[i].price),
+                        is_train: &vec_chunk[i].is_train,
+                    }
+                });
             }
         }
 
@@ -401,6 +480,13 @@ async fn main() -> Result<()> {
                 arrange_millis::get(std::time::Instant::now().duration_since(start).as_millis(),),
                 vec_main.len(),
             );
+
+            insert_into!(db::itemid_asin::table, conn, vec_main, db::NewItemidAsin, {
+                db::NewItemidAsin {
+                    itemid: &vec_chunk[i].itemid,
+                    asin: &vec_chunk[i].asin,
+                }
+            });
         }
 
         {
@@ -416,7 +502,9 @@ async fn main() -> Result<()> {
                     let itemid = record.itemid as i32;
                     let also_view_itemid = record.also_view_itemid as i32;
                     let is_train = record.is_train as i32;
+                    let id = vec_main.len() as i32;
                     vec_main.push(RecordAlsoView {
+                        id,
                         itemid,
                         also_view_itemid,
                         is_train,
@@ -429,6 +517,15 @@ async fn main() -> Result<()> {
                     ),
                     vec_main.len(),
                 );
+
+                insert_into!(db::also_view::table, conn, vec_main, db::NewAlsoView, {
+                    db::NewAlsoView {
+                        id: &vec_chunk[i].id,
+                        itemid: &vec_chunk[i].itemid,
+                        also_view_itemid: &vec_chunk[i].also_view_itemid,
+                        is_train: &vec_chunk[i].is_train,
+                    }
+                });
             }
         }
 
@@ -446,7 +543,9 @@ async fn main() -> Result<()> {
                     let itemid = record.itemid as i32;
                     let is_train = if record.is_train { 1 } else { 0 };
                     let category_id = normalize!(record.category, dic_category);
+                    let id = vec_main.len() as i32;
                     vec_main.push(RecordCategory {
+                        id,
                         itemid,
                         category_id,
                         is_train,
@@ -460,6 +559,28 @@ async fn main() -> Result<()> {
                     vec_main.len(),
                     dic_category.len(),
                 );
+
+                insert_into!(
+                    db::dic_category::table,
+                    conn,
+                    dic_category,
+                    db::NewDicCategory,
+                    {
+                        db::NewDicCategory {
+                            id: &vec_chunk[i].1,
+                            value: vec_chunk[i].0.as_str(),
+                        }
+                    }
+                );
+
+                insert_into!(db::category::table, conn, vec_main, db::NewCategory, {
+                    db::NewCategory {
+                        id: &vec_chunk[i].id,
+                        itemid: &vec_chunk[i].itemid,
+                        category_id: &vec_chunk[i].category_id,
+                        is_train: &vec_chunk[i].is_train,
+                    }
+                });
             }
         }
     }

@@ -6,4 +6,4 @@ data/*.json
 .ipynb_checkpoints/*
 model_plot.png
 target/
-__pycache__/
+__pycache__

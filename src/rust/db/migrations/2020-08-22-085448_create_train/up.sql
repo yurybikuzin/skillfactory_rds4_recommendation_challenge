@@ -36,12 +36,27 @@ create table image (
 drop table if exists item;
 create table item (
     itemid integer primary key not null,
-    brand text,
-    description text,
-    title text,
+    brand_id integer,
+    description_id integer,
+    title_id integer,
     main_cat_id integer,
-    price text integer,
+    price integer,
     is_train integer not null
+);
+drop table if exists dic_brand;
+create table dic_brand (
+    id integer primary key not null,
+    value text not null unique
+);
+drop table if exists dic_description;
+create table dic_description (
+    id integer primary key not null,
+    value text not null unique
+);
+drop table if exists dic_title;
+create table dic_title (
+    id integer primary key not null,
+    value text not null unique
 );
 drop table if exists dic_main_cat;
 create table dic_main_cat (
@@ -53,7 +68,7 @@ create table category (
     id integer primary key not null,
     itemid integer not null,
     category_id integer not null,
-    is_train integer not null,
+    is_train integer not null
 );
 drop table if exists dic_category;
 create table dic_category (
@@ -65,5 +80,10 @@ create table also_view (
     id integer primary key not null,
     itemid integer not null,
     also_view_itemid integer not null,
-    is_train integer not null,
+    is_train integer not null
+);
+drop table if exists itemid_asin;
+create table itemid_asin (
+    itemid integer primary key not null,
+    asin text non null
 );

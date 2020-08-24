@@ -1,4 +1,7 @@
-use super::schema::{dic_image, dic_reviewer_name, dic_summary, image, train};
+use super::schema::{
+    also_view, category, dic_brand, dic_category, dic_description, dic_image, dic_main_cat,
+    dic_reviewer_name, dic_summary, dic_title, image, item, itemid_asin, train,
+};
 // use serde::Serialize;
 
 // #[derive(Serialize, Queryable)]
@@ -31,7 +34,6 @@ pub struct NewTrain<'a> {
     pub summary_id: Option<&'a i32>,
     pub vote: Option<&'a i32>,
     // pub style: Option<String>,
-    // pub image: Option<String>,
 }
 
 #[derive(Insertable)]
@@ -61,4 +63,76 @@ pub struct NewDicSummary<'a> {
 pub struct NewDicImage<'a> {
     pub id: &'a i32,
     pub value: &'a str,
+}
+
+#[derive(Insertable)]
+#[table_name = "item"]
+pub struct NewItem<'a> {
+    pub itemid: &'a i32,
+    pub brand_id: Option<&'a i32>,
+    pub description_id: Option<&'a i32>,
+    pub title_id: Option<&'a i32>,
+    pub main_cat_id: Option<&'a i32>,
+    pub price: Option<&'a i32>,
+    pub is_train: &'a i32,
+}
+
+#[derive(Insertable)]
+#[table_name = "category"]
+pub struct NewCategory<'a> {
+    pub id: &'a i32,
+    pub itemid: &'a i32,
+    pub category_id: &'a i32,
+    pub is_train: &'a i32,
+}
+
+#[derive(Insertable)]
+#[table_name = "also_view"]
+pub struct NewAlsoView<'a> {
+    pub id: &'a i32,
+    pub itemid: &'a i32,
+    pub also_view_itemid: &'a i32,
+    pub is_train: &'a i32,
+}
+
+#[derive(Insertable)]
+#[table_name = "dic_brand"]
+pub struct NewDicBrand<'a> {
+    pub id: &'a i32,
+    pub value: &'a str,
+}
+
+#[derive(Insertable)]
+#[table_name = "dic_title"]
+pub struct NewDicTitle<'a> {
+    pub id: &'a i32,
+    pub value: &'a str,
+}
+
+#[derive(Insertable)]
+#[table_name = "dic_description"]
+pub struct NewDicDescription<'a> {
+    pub id: &'a i32,
+    pub value: &'a str,
+}
+
+#[derive(Insertable)]
+#[table_name = "dic_main_cat"]
+pub struct NewDicMainCat<'a> {
+    pub id: &'a i32,
+    pub value: &'a str,
+}
+
+#[derive(Insertable)]
+#[table_name = "dic_category"]
+pub struct NewDicCategory<'a> {
+    pub id: &'a i32,
+    pub value: &'a str,
+}
+
+#[derive(Insertable)]
+#[table_name = "itemid_asin"]
+pub struct NewItemidAsin<'a> {
+    pub itemid: &'a i32,
+    pub asin: &'a str,
 }

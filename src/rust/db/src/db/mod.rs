@@ -5,8 +5,15 @@ use dotenv::dotenv;
 mod models;
 mod schema;
 
-pub use models::{NewDicImage, NewDicReviewerName, NewDicSummary, NewImage, NewTrain};
-pub use schema::{dic_image, dic_reviewer_name, dic_summary, image, train};
+pub use models::{
+    NewAlsoView, NewCategory, NewDicBrand, NewDicCategory, NewDicDescription, NewDicImage,
+    NewDicMainCat, NewDicReviewerName, NewDicSummary, NewDicTitle, NewImage, NewItem,
+    NewItemidAsin, NewTrain,
+};
+pub use schema::{
+    also_view, category, dic_brand, dic_category, dic_description, dic_image, dic_main_cat,
+    dic_reviewer_name, dic_summary, dic_title, image, item, itemid_asin, train,
+};
 // use schema::train::dsl::*;
 
 pub fn establish_connection() -> SqliteConnection {

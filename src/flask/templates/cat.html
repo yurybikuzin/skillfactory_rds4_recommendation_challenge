@@ -1,4 +1,6 @@
 <!doctype html>
+<title>{{cat.name}}</title>
+<!doctype html>
 <html>
 
 <head>
@@ -13,19 +15,25 @@
 <header>
 </header>
 
-<div class="padded">
-    <h1>Groceries & Gourmet Food <sup>{{count_item}}<sup></h1>
+<a id="back" href="/">
+    <div class="icon"></div><div class="title">Grocery &amp; Gourmet Food</div>
+</a>
 
-    <div>Shop groceries online for deliver of coffee, snacks, chocolate, and everyday food</div>
+<h1 class="padded">{{cat.name}}</h1>
 
-    <div id="shop-by-category">Shop by Category <sup>{{ count_category }}</sup></div>
-
-    <ul id="category">
-    {% for item in list_category %}
-    <li><a href="/cat/{{item.id}}">{{item.name}}</a> <sup>{{item.count}}<sup></li>
-    {% endfor %}
-    </ul>
+<div id="filter-block" class="padded">
+    <div>Found {{ cat.filter.found() }} results</div> 
+    <a id="filter-button" href="/filter/{{cat.id}}{{cat.filter.as_str()}}">
+        <div>Filters</div>
+        {% if cat.filter.count() > 0 %}
+            <div class="colored">({{cat.filter.count()}})</div>
+        {% endif %}
+        <div class="icon-triangle-down"></div>
+    </a>
 </div>
+<!-- <a href="/">Back</a> -->
+<!-- <h1>{{cat.name}}</h1> -->
+<!-- HERE WE ARE -->
 
 <footer>
         

@@ -2,8 +2,8 @@
 drop table if exists train;
 create table train (
     id integer primary key not null,
-    userid integer not null,
     itemid integer not null,
+    userid integer not null,
     rating integer not null,
     overall integer not null,
     verified integer not null,
@@ -12,6 +12,11 @@ create table train (
     summary_id integer,
     vote integer
 );
+create index itemid on train(itemid,userid);
+create index userid on train(userid,itemid);
+create index unix_review_time on train(unix_review_time);
+create index vote on train(vote);
+
 drop table if exists dic_reviewer_name;
 create table dic_reviewer_name (
     id integer primary key not null,
@@ -39,10 +44,11 @@ create table item (
     brand_id integer,
     description_id integer,
     title_id integer,
-    main_cat_id integer,
+    -- main_cat_id integer,
     price integer,
     is_train integer not null
 );
+create index price on item(price);
 drop table if exists dic_brand;
 create table dic_brand (
     id integer primary key not null,
@@ -58,11 +64,11 @@ create table dic_title (
     id integer primary key not null,
     value text not null unique
 );
-drop table if exists dic_main_cat;
-create table dic_main_cat (
-    id integer primary key not null,
-    value text not null unique
-);
+-- drop table if exists dic_main_cat;
+-- create table dic_main_cat (
+--     id integer primary key not null,
+--     value text not null unique
+-- );
 drop table if exists category;
 create table category (
     id integer primary key not null,

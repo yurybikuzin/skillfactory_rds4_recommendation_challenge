@@ -7,8 +7,7 @@ mod schema;
 
 pub use models::{
     NewAlsoView, NewCategory, NewDicBrand, NewDicCategory, NewDicDescription, NewDicImage,
-    NewDicMainCat, NewDicReviewerName, NewDicSummary, NewDicTitle, NewImage, NewItem,
-    NewItemidAsin, NewTrain,
+    NewDicReviewerName, NewDicSummary, NewDicTitle, NewImage, NewItem, NewItemidAsin, NewTrain,
 };
 pub use schema::{
     also_view, category, dic_brand, dic_category, dic_description, dic_image, dic_main_cat,

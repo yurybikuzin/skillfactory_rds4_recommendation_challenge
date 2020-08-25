@@ -86,7 +86,6 @@ table! {
         brand_id -> Nullable<Integer>,
         description_id -> Nullable<Integer>,
         title_id -> Nullable<Integer>,
-        main_cat_id -> Nullable<Integer>,
         price -> Nullable<Integer>,
         is_train -> Integer,
     }
@@ -102,8 +101,8 @@ table! {
 table! {
     train (id) {
         id -> Integer,
-        userid -> Integer,
         itemid -> Integer,
+        userid -> Integer,
         rating -> Integer,
         overall -> Integer,
         verified -> Integer,

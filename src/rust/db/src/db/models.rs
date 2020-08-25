@@ -1,6 +1,6 @@
 use super::schema::{
-    also_view, category, dic_brand, dic_category, dic_description, dic_image, dic_main_cat,
-    dic_reviewer_name, dic_summary, dic_title, image, item, itemid_asin, train,
+    also_view, category, dic_brand, dic_category, dic_description, dic_image, dic_reviewer_name,
+    dic_summary, dic_title, image, item, itemid_asin, train,
 };
 // use serde::Serialize;
 
@@ -72,7 +72,7 @@ pub struct NewItem<'a> {
     pub brand_id: Option<&'a i32>,
     pub description_id: Option<&'a i32>,
     pub title_id: Option<&'a i32>,
-    pub main_cat_id: Option<&'a i32>,
+    // pub main_cat_id: Option<&'a i32>,
     pub price: Option<&'a i32>,
     pub is_train: &'a i32,
 }
@@ -116,12 +116,12 @@ pub struct NewDicDescription<'a> {
     pub value: &'a str,
 }
 
-#[derive(Insertable)]
-#[table_name = "dic_main_cat"]
-pub struct NewDicMainCat<'a> {
-    pub id: &'a i32,
-    pub value: &'a str,
-}
+// #[derive(Insertable)]
+// #[table_name = "dic_main_cat"]
+// pub struct NewDicMainCat<'a> {
+//     pub id: &'a i32,
+//     pub value: &'a str,
+// }
 
 #[derive(Insertable)]
 #[table_name = "dic_category"]

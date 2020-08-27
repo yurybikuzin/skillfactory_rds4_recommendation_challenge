@@ -1,0 +1,229 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Amazing.com: Grocery & Gouurmet Food</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css"></style>
+    <meta name="viewport" content="width=device-width, maximum-scale=1, minimum-scale=1, initial-scale=1, user-scalable=no, shrink-to-fit=no">
+    <style>
+        {% for item in filter.list_sort() %}
+            #sort-{{item.id}}:checked ~ ul label[for="sort-{{item.id}}"]
+            {{ "," if not loop.last }}
+        {% endfor %}
+        {
+            background-color: #fef8f2;
+            border-color: #e77600;
+        }
+        label[data-selected="true"] {
+            background-color: #fef8f2 !important;
+            border-color: #e77600 !important;
+        }
+    </style>
+    <script defer src="/script.js{{filter.as_str()}}">
+    </script>
+    <script>
+        function filterClick(event) {
+            const footer = document.querySelector('footer')
+            {
+                const rect = footer.getBoundingClientRect()
+                console.log(rect.top, document.documentElement.clientHeight)
+                const delta = document.documentElement.clientHeight - rect.top
+                if (delta > 0) {
+                    footer.style.cssText = 'top: ' + Math.round(delta) + 'px'
+                }
+            }
+            const header = document.querySelector('header')
+            const h1 = document.querySelector('h1')
+            const filterHeader = document.getElementById('filter-header')
+            const rect = filterHeader.getBoundingClientRect()
+            {
+                header.style.cssText = 'top: -' + Math.round(rect.top) + 'px'
+                h1.style.cssText = 'top: -' + Math.round(rect.top) + 'px'
+                filterHeader.style.cssText = 'top: -' + Math.round(rect.top) + 'px'
+            }
+            setTimeout(function(){
+                h1.style.cssText = 'display: none'
+                header.style.cssText = 'display: none'
+                filterHeader.style.cssText = 'position: static'
+                footer.style.cssText = 'display: none'
+                const filterButtom = document.getElementById('filter-button')
+                filterHeader.dataset.state = "opened"
+                console.log(filterHeader.dataset.state)
+            }, 250)
+            // header.classList.add('rollup')
+            // h1.classList.add('rollup')
+        }
+    </script>
+    <style>
+        header, h1, #filter-header, footer {
+            position: relative;
+            top: 0;
+            transition: top 0.25s;
+        }
+        #filter-button .icon-triangle {
+            border-width: 4px;
+            border-style: solid;
+            border-color: transparent;
+        }
+        #filter-button[data-state="closed"] .icon-triangle {
+            border-top-color: #000;
+            margin-left: 8px;
+            margin-top: 4px;
+        }
+        #filter-button[data-state="opened"] .icon-triangle {
+            border-bottom-color: #000;
+            margin-left: 8px;
+            margin-top: 0px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- <form action="/" method="post"> -->
+<!-- <fieldset id="open&#45;filter&#45;group"> -->
+<!-- <input type="radio" name="open&#45;filter&#45;radio" id="open&#45;filter&#45;radio"/> -->
+
+<header>
+</header>
+
+<h1 class="padded">Groceries & Gourmet Food</h1>
+
+<div id="filter-header" class="padded">
+    <div>Found {{ filter.found() }} results</div> 
+
+    <label id="filter-button" onclick="filterClick(event)" data-state="closed">
+        <div>Filters</div>
+        {% if filter.count() > 0 %}
+            <div class="colored">({{filter.count()}})</div>
+        {% endif %}
+        <div class="icon-triangle down"></div>
+    </label>
+</div>
+
+<!-- <div id="filter&#45;content" class="padded"> -->
+<!--     <div class="filter&#45;section"> -->
+<!--         <fieldset id="sort"> -->
+<!--         <div class="header">Sort by</div> -->
+<!--         {% for item in filter.list_sort() %} -->
+<!--             <input  -->
+<!--                 type="radio"  -->
+<!--                 name="sort"  -->
+<!--                 value="{{item.id}}"  -->
+<!--                 id="sort&#45;{{item.id}}" -->
+<!--                 {% if item.id == filter.sort %}checked {% endif %} -->
+<!--             /> -->
+<!--         {% endfor %} -->
+<!--         <ul class="content"> -->
+<!--             {% for item in filter.list_sort() %} -->
+<!--             <li><label for="sort&#45;{{item.id}}"/>{{item.name}}</li> -->
+<!--             {% endfor %} -->
+<!--         <ul> -->
+<!--         </fieldset> -->
+<!--     </div> -->
+<!--  -->
+<!--     <div class="filter&#45;section"> -->
+<!--         <fieldset id="cat"> -->
+<!--         <input  -->
+<!--             type="checkbox"  -->
+<!--             name="show&#45;more&#45;cat"  -->
+<!--             id="show&#45;more&#45;cat" -->
+<!--         /> -->
+<!--         <div class="header"> -->
+<!--             <span>Category <sup>{{ filter.list_cat_len() }}</sup><span> -->
+<!--             <label for="show&#45;more&#45;cat">show  -->
+<!--                 <span class="more">more</span> -->
+<!--                 <span class="less">less</span> -->
+<!--             </label> -->
+<!--         </div> -->
+<!--         {% for item in filter.list_cat() %} -->
+<!--             <input  -->
+<!--                 type="checkbox"  -->
+<!--                 name="cat"  -->
+<!--                 value="{{item.id}}"  -->
+<!--                 id="cat&#45;{{item.id}}" -->
+<!--                 {% if item.id in filter.selected_list_cat %}checked {% endif %} -->
+<!--             /> -->
+<!--         {% endfor %} -->
+<!--         <ul class="content"> -->
+<!--             {% for item in filter.list_cat() %} -->
+<!--             <li -->
+<!--                 {% if item.count < 2000 %} -->
+<!--                 class="more" -->
+<!--                 {% endif %} -->
+<!--             ><label  -->
+<!--                 data&#45;id="{{item.id}}"  -->
+<!--                 onclick="labelClick(event, 'cat')" -->
+<!--                 {% if item.id in filter.selected_list_cat %}data&#45;selected="true"{% endif %} -->
+<!--             />{{item.name}}</li> -->
+<!--             {% endfor %} -->
+<!--         <ul> -->
+<!--         </fieldset> -->
+<!--     </div> -->
+<!--  -->
+<!--     <div class="filter&#45;section brand"> -->
+<!--         <fieldset id="brand"> -->
+<!--         <input  -->
+<!--             type="checkbox"  -->
+<!--             name="show&#45;more&#45;brand"  -->
+<!--             id="show&#45;more&#45;brand" -->
+<!--         /> -->
+<!--         <div class="header"> -->
+<!--             <span>Brand <sup>{{ filter.list_brand_len() }}</sup><span> -->
+<!--             <label  -->
+<!--                 data&#45;selected="show&#45;less" -->
+<!--                 onclick="showMoreClick(event, 'brand')" -->
+<!--                 for="show&#45;more&#45;brand" -->
+<!--             >show  -->
+<!--                 <span class="more">more</span> -->
+<!--                 <span class="less">less</span> -->
+<!--             </label> -->
+<!--         </div> -->
+<!--         {% for item in filter.list_brand() %} -->
+<!--             <input  -->
+<!--                 type="checkbox"  -->
+<!--                 name="brand"  -->
+<!--                 value="{{item.id}}"  -->
+<!--                 id="brand&#45;{{item.id}}" -->
+<!--                 {% if item.id in filter.selected_list_brand %}checked {% endif %} -->
+<!--             /> -->
+<!--         {% endfor %} -->
+<!--         <ul class="content" onclick="labelClick(event, 'brand')"> -->
+<!--             {% for item in filter.list_brand() %} -->
+<!--                 {% if item.count >= 150 %} -->
+<!--                 <li><label  -->
+<!--                     data&#45;id="{{item.id}}"  -->
+<!--                     {% if item.id in filter.selected_list_brand %}data&#45;selected="true"{% endif %} -->
+<!--                 />{{item.name}}</li> -->
+<!--                 {% endif %} -->
+<!--             {% endfor %} -->
+<!--         <ul> -->
+<!--         </fieldset> -->
+<!--     </div> -->
+<!-- </div> -->
+
+
+<footer>
+        
+</footer>
+
+<!-- </fieldset> -->
+<!--  -->
+<!-- </form> -->
+
+<!-- {% for item in list_items %} -->
+<!-- <!&#45;&#45; https://stackoverflow.com/questions/58142293/fetching&#38;#45;amazon&#38;#45;product&#38;#45;image&#38;#45;by&#38;#45;asin &#45;&#45;> -->
+<!-- <div> -->
+<!--     <h2>{{ item.title }}</h2> -->
+<!--     <!&#45;&#45; <img src="https://ws&#38;#45;na.amazon&#38;#45;adsystem.com/widgets/q?_encoding=UTF8&#38;#38;MarketPlace=US&#38;#38;ASIN={{ item.asin }}&#38;#38;ServiceVersion=20070822&#38;#38;ID=AsinImage&#38;#38;WS=1&#38;#38;Format=SL250"></img> &#45;&#45;> -->
+<!--     <img src="https://ws&#45;eu.amazon&#45;adsystem.com/widgets/q?_encoding=UTF8&#38;MarketPlace=GB&#38;ASIN={{ item.asin }}&#38;ServiceVersion=20070822&#38;ID=AsinImage&#38;WS=1&#38;Format=SL250"></img> -->
+<!--  -->
+<!-- </div> -->
+<!-- <!&#45;&#45; <li><a href="/main_cat/{{main_cat}}">{{ main_cat }}</a></li> &#45;&#45;> -->
+<!-- {% endfor %} -->
+</body>
+
+</html>
+

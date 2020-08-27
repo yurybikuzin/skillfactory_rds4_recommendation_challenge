@@ -23,7 +23,7 @@
 
 <div id="filter-block" class="padded">
     <div>Found {{ cat.filter.found() }} results</div> 
-    <a id="filter-button" href="/filter/{{cat.id}}{{cat.filter.as_str()}}">
+    <a id="filter-button" href="/filter{{cat.filter.as_str()}}">
         <div>Filters</div>
         {% if cat.filter.count() > 0 %}
             <div class="colored">({{cat.filter.count()}})</div>

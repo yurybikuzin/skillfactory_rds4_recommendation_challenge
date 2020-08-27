@@ -1,0 +1,82 @@
+body > header, 
+body > h1, 
+body > footer,
+#filter
+{
+    position: relative;
+    top: 0;
+    transition: top 0.5s;
+}
+
+#filter {
+    display: flex;
+    flex-direction: column;
+    transition: top 0.5s, max-height 0.5s;
+    max-height: 44px;
+}
+
+#filter[data-state="opened"] {
+    height: 100vh;
+    max-height: 100vh;
+}
+
+/* =============================================== */
+
+#filter > header {
+    flex-grow: 0;
+    display: flex;
+    align-items: center;
+    height: 44px;
+    background-color: rgba(0,0,0,.03);
+    border-bottom: .1rem solid rgba(0,0,0,.05);
+    box-shadow: 0 0.1rem 0 rgba(0,0,0,.03) inset, 0 0.1rem 0 rgba(255,255,255,.3);
+    padding-left: 12px;
+    font-size: 13px;
+}
+
+#filter > header > * {
+    flex-grow: 1;
+}
+
+
+/* =============================================== */
+
+#filter > main {
+    background-color: blue;
+    flex-grow: 1;
+    overflow: scroll;
+}
+
+/* =============================================== */
+
+#filter > footer {
+    flex-grow: 0;
+    height: 46px;
+    background: red;
+}
+
+#filter[data-state="closed"] > footer {
+    display: none;
+}
+#filter[data-state="opened"] > footer {
+    display: block;
+}
+
+/* =========================================================== */
+/* icon-triangle */
+#filter .icon-triangle {
+    border-width: 4px;
+    border-style: solid;
+    border-color: transparent;
+}
+#filter[data-state="closed"] .icon-triangle {
+    border-top-color: #000;
+    margin-left: 8px;
+    margin-top: 4px;
+}
+#filter[data-state="opened"] .icon-triangle {
+    border-bottom-color: #000;
+    margin-left: 8px;
+    margin-top: 0px;
+    margin-bottom: 4px;
+}

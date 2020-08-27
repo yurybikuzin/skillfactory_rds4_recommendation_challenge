@@ -1,26 +1,41 @@
 function filterClick(event) {
+    const header = document.querySelector('body > header')
+    const footer = document.querySelector('body > footer')
+    const h1 = document.querySelector('h1')
     const filter = document.getElementById('filter')
     if (filter.dataset.state == "closed") {
-        const footer = document.querySelector('body > footer')
-        const header = document.querySelector('body > header')
-        const h1 = document.querySelector('h1')
         const rect = filter.getBoundingClientRect()
-        {
-            header.style.cssText = 'top: -' + Math.round(rect.top) + 'px'
-            h1.style.cssText = 'top: -' + Math.round(rect.top) + 'px'
-            footer.style.cssText = 'top: -' + Math.round(rect.top) + 'px'
-            filter.style.cssText = 'top: -' + Math.round(rect.top) + 'px; max-height: 100vh; height: 100vh'
-        }
+        let cssText = 'top: -' + Math.round(rect.top) + 'px'
+        console.log(cssText)
+        header.style.cssText = cssText
+        footer.style.cssText = cssText
+        h1.style.cssText = cssText
+        filter.style.cssText = cssText + '; max-height: 100vh; height: 100vh'
         let timeoutElapsed = false
         let filterHtml
         setTimeout(function(){
-            h1.style.cssText = 'display: none'
-            header.style.cssText = 'display: none'
-            footer.style.cssText = 'display: none'
-            filter.dataset.state = "opened"
+            cssText = cssText + '; display: none'
+            header.style.cssText = cssText
+            footer.style.cssText = cssText
+            h1.style.cssText = cssText
             filter.style.cssText = 'position: static'
+            filter.dataset.state = "opened"
             timeoutElapsed = true
         }, 500)
         fetch('/filter-content').then((response) => response.text()).then((text) => console.log(text))
+    } else {
+        const cssTop = header.style.cssText.split(';')[0]
+        const cssText = cssTop + '; display: block'
+        header.style.cssText = cssText
+        footer.style.cssText = cssText
+        h1.style.cssText = cssText
+        filter.style.cssText = cssTop + '; transition: top 0s; position: relative'
+        setTimeout(function() {
+            header.style.cssText = ''
+            footer.style.cssText = ''
+            h1.style.cssText = ''
+            filter.style.cssText = ''
+            filter.dataset.state = "closed"
+        }, 1)
     }
 }

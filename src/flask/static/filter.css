@@ -12,11 +12,11 @@ body > footer,
     display: flex;
     flex-direction: column;
     transition: top 0.5s, max-height 0.5s;
+    height: 100vh;
     max-height: 44px;
 }
 
 #filter[data-state="opened"] {
-    height: 100vh;
     max-height: 100vh;
 }
 

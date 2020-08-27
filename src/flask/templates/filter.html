@@ -1,7 +1,7 @@
 <header class="padded">
     <div>Found {{ filter.found() }} results</div> 
 
-    <label id="filter-button" onclick="filterClick(event)">
+    <label id="filter-button" onclick="filterClick()">
         <div>Filters</div>
         {% if filter.count() > 0 %}
             <div class="colored">({{filter.count()}})</div>
@@ -13,6 +13,8 @@
 <main>
 </main>
 
-<footer>
+<footer class="padded">
+    <label>Clear Filters</label>
+    <label onClick="filterClick()">Done</label>
 </footer>
 

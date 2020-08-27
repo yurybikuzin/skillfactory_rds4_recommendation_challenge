@@ -1,4 +1,4 @@
-function filterClick(event) {
+function filterClick() {
     const header = document.querySelector('body > header')
     const footer = document.querySelector('body > footer')
     const h1 = document.querySelector('h1')

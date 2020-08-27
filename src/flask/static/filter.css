@@ -50,17 +50,26 @@ body > footer,
 /* =============================================== */
 
 #filter > footer {
+    display: flex;
     flex-grow: 0;
     height: 46px;
-    background: red;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+#filter > footer > label {
+    font-size: 15px;
+    color: #0066C0;
+    margin-right: 15px;
+    margin-left: 20px;
 }
 
 #filter[data-state="closed"] > footer {
     display: none;
 }
-#filter[data-state="opened"] > footer {
-    display: block;
-}
+/* #filter[data-state="opened"] > footer { */
+/*     display: flex; */
+/* } */
 
 /* =========================================================== */
 /* icon-triangle */

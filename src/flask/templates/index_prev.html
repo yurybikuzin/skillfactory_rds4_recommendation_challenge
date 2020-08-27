@@ -104,25 +104,25 @@
 </div>
 
 <!-- <div id="filter&#45;content" class="padded"> -->
-<!--     <div class="filter&#45;section"> -->
-<!--         <fieldset id="sort"> -->
-<!--         <div class="header">Sort by</div> -->
-<!--         {% for item in filter.list_sort() %} -->
-<!--             <input  -->
-<!--                 type="radio"  -->
-<!--                 name="sort"  -->
-<!--                 value="{{item.id}}"  -->
-<!--                 id="sort&#45;{{item.id}}" -->
-<!--                 {% if item.id == filter.sort %}checked {% endif %} -->
-<!--             /> -->
-<!--         {% endfor %} -->
-<!--         <ul class="content"> -->
-<!--             {% for item in filter.list_sort() %} -->
-<!--             <li><label for="sort&#45;{{item.id}}"/>{{item.name}}</li> -->
-<!--             {% endfor %} -->
-<!--         <ul> -->
-<!--         </fieldset> -->
-<!--     </div> -->
+    <div class="filter-section">
+        <!-- <fieldset id="sort"> -->
+        <div class="header">Sort by</div>
+        {% for item in filter.list_sort() %}
+            <input 
+                type="radio" 
+                name="sort" 
+                value="{{item.id}}" 
+                id="sort-{{item.id}}"
+                {% if item.id == filter.sort %}checked {% endif %}
+            />
+        {% endfor %}
+        <ul class="content">
+            {% for item in filter.list_sort() %}
+            <li><label for="sort-{{item.id}}"/>{{item.name}}</li>
+            {% endfor %}
+        <ul>
+        <!-- </fieldset> -->
+    </div>
 <!--  -->
 <!--     <div class="filter&#45;section"> -->
 <!--         <fieldset id="cat"> -->

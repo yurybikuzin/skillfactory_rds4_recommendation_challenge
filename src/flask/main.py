@@ -77,10 +77,10 @@ def index():
 #     return render_template('cat.html', cat=cat)
 
 
-@app.route('/filter-content')
+@app.route('/filter-main')
 def filter():
     filter = Filter()
-    return render_template('filter.html', filter=filter)
+    return render_template('filter-main.html', filter=filter)
 
 # class Cat:
 #     _list_sort = None

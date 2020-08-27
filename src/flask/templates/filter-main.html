@@ -1,0 +1,18 @@
+
+<section>
+    <header>Sort by</header>
+    <ul onclick="ulClick(event)">
+        {% for item in filter.list_sort() %}
+        <li data-id="{{item.id}}">{{item.name}}</li>
+        {% endfor %}
+    <ul>
+</section>
+
+<section>
+    <header>Category</header>
+    <ul 
+        onclick="ulClick(event)" 
+        data-data='{{ filter.list_cat() | tojson }}'
+        data-height-max='0.2'
+    ></ul>
+</section>

@@ -6,24 +6,7 @@
     <title>Amazing.com: Grocery & Gouurmet Food</title>
     <link rel="stylesheet" type="text/css" href="/static/style.css"></style>
     <meta name="viewport" content="width=device-width, maximum-scale=1, minimum-scale=1, initial-scale=1, user-scalable=no, shrink-to-fit=no">
-    <style>
-        {% for item in filter.list_sort() %}
-            #sort-{{item.id}}:checked ~ ul label[for="sort-{{item.id}}"]
-            {{ "," if not loop.last }}
-        {% endfor %}
-        {
-            background-color: #fef8f2;
-            border-color: #e77600;
-        }
-        label[data-selected="true"] {
-            background-color: #fef8f2 !important;
-            border-color: #e77600 !important;
-        }
-    </style>
-    <!-- <script defer src="/script.js{{filter.as_str()}}"> -->
-    <!-- </script> -->
-    <script src="/static/filter.js">
-    </script>
+    <script src="/static/filter.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/filter.css"></style>
 </head>
 

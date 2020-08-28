@@ -1,5 +1,6 @@
-const filters = {
-}
+let filter = { }
+
+let filter_original = { }
 
 function prepareFilterSections() {
     const list_ul = document.querySelectorAll("#filter > main > section > ul[data-data]")
@@ -7,6 +8,19 @@ function prepareFilterSections() {
         const list_item = JSON.parse(ul.dataset.data)
         const height_client = document.documentElement.clientHeight
         const height_max = height_client * parseFloat(ul.dataset.heightMax)
+
+        if (ul.dataset.selected) {
+            let json = JSON.parse(list_item.dataset.selected)
+            const name = list_item.dataset.name
+            if (Array.isArray(json)) {
+                filter[name] = new Set(json)
+                filter_original[name] = new Set(json)
+            } else {
+                filter[name] = json
+                filter_original[name] = json
+            }
+        }
+
         let is_truncated = false
         for (let item of list_item) {
             const el = document.createElement("li")
@@ -22,6 +36,7 @@ function prepareFilterSections() {
         if (is_truncated) {
             const header = ul.previousElementSibling
             const el = document.createElement('label')
+            el.dataset.state = 'less'
             el.innerText = 'show more'
             el.onclick = showMoreClick
             header.appendChild(el)
@@ -32,39 +47,77 @@ function prepareFilterSections() {
 function showMoreClick(event) {
     const label = event.target
     const ul = label.parentElement.nextElementSibling
-    const list_item = JSON.parse(ul.dataset.data)
-    const to_skip_count = ul.children.length
-    let i = 0
-    for (let item of list_item) {
-        if (i < to_skip_count) {
-            i++
-        } else {
-            const el = document.createElement("li")
-            el.dataset.id = item.id
-            el.innerText = item.name
-            ul.appendChild(el)
+    if (label.dataset.state == 'less') {
+        const list_item = JSON.parse(ul.dataset.data)
+        const skip_count = ul.children.length
+        let i = 0
+        for (let item of list_item) {
+            if (i < skip_count) {
+                i++
+            } else {
+                const el = document.createElement("li")
+                el.dataset.id = item.id
+                el.innerText = item.name
+                ul.appendChild(el)
+            }
+        }
+        label.dataset.lessCount = skip_count
+        label.dataset.state = 'more'
+        label.innerText = 'show less'
+        const section = ul.parentElement
+        const main = section.parentElement
+        const footer = main.nextElementSibling
+        const height_max = footer.offsetTop - main.offsetTop - 48
+        if (ul.offsetHeight > height_max) {
+            ul.style.cssText = 'height: ' + height_max + 'px; overflow-y: scroll'
+        }
+        main.scrollTo({left: 0, top: section.offsetTop - main.offsetTop - 4, behavior: 'smooth'})
+    } else {
+        let less_count = label.dataset.lessCount
+        while (ul.children.length > less_count) {
+            ul.removeChild(ul.lastChild)
+        }
+        label.dataset.state = 'less'
+        label.innerText = 'show more'
+        if (ul.style.cssText != '') {
+            ul.style.cssText = ''
         }
     }
-    label.innerText = 'show less'
 }
 
-function ulClick(event, kind) {
-    const target = event.target
-    if (target && target.tagName == "LI") {
-        const id_selected = target.dataset.id
-        const id_current = filters[kind]
-        if (id_selected != id_current) {
-            filters[kind] = id_selected
-            Array.prototype.forEach.call(target.parentElement.children, li => {
-                if (li.dataset.id == id_selected) {
-                    li.dataset.selected = "true"
+function ulClick(event, name) {
+    if (event.target.tagName == "LI") {
+        const li = event.target
+        const ul = li.parentElement
+        const id_selected = li.dataset.id
+        if (ul.dataset.type == 'multi') {
+            const id_current = filter[name]
+            if (id_current && id_current.has(id_selected)) {
+                li.dataset.selected = "false"
+                filter[name].delete(id_selected)
+            } else {
+                li.dataset.selected = "true"
+                if (id_current) {
+                    filter[name].add(id_selected)
                 } else {
-                    li.dataset.selected = "false"
+                    filter[name] = new Set([id_selected])
                 }
-            })
+            }
         } else {
-            delete filters[kind]
-            target.dataset.selected = "false"
+            const id_current = filter[name]
+            if (id_selected != id_current) {
+                filter[name] = id_selected
+                Array.prototype.forEach.call(ul.children, li => {
+                    if (li.dataset.id == id_selected) {
+                        li.dataset.selected = "true"
+                    } else {
+                        li.dataset.selected = "false"
+                    }
+                })
+            } else {
+                li.dataset.selected = "false"
+                delete filter[name]
+            }
         }
     }
 }
@@ -109,6 +162,7 @@ function filterClick() {
             h1.style.cssText = ''
             filter.style.cssText = ''
             filter.dataset.state = "closed"
+            console.log('send request', filter)
         }, 1)
     }
 }

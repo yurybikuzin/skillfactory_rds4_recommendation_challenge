@@ -23,10 +23,11 @@ body > footer,
 /* =============================================== */
 
 #filter > header {
-    flex-grow: 0;
+    flex: 0 0 44px;
+    /* flex-grow: 0; */
     display: flex;
     align-items: center;
-    height: 44px;
+    /* height: 44px; */
     background-color: rgba(0,0,0,.03);
     border-bottom: .1rem solid rgba(0,0,0,.05);
     box-shadow: 0 0.1rem 0 rgba(0,0,0,.03) inset, 0 0.1rem 0 rgba(255,255,255,.3);
@@ -50,8 +51,9 @@ body > footer,
 
 #filter > footer {
     display: flex;
-    flex-grow: 0;
-    height: 46px;
+    /* flex-grow: 0; */
+    flex: 0 0 46px;
+    /* height: 46px; */
     justify-content: flex-end;
     align-items: center;
 }
@@ -116,6 +118,7 @@ body > footer,
     margin-right: 5px;
     text-align: center;
     font-size: 13px;
+    cursor: pointer;
 }
 
 #filter > main > section > ul > li[data-selected="true"] {

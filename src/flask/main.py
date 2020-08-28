@@ -128,12 +128,24 @@ class Filter:
     selected_list_price_as_str = None
     _found = None
     _count = None
+    # def as_dict(self):
+    #     result = {}
+    #     if self.selected_sort is not None:
+    #         result['sort'] = self.selected_sort
+    #     if self.selected_list_price is not None:
+    #         result['price'] = self.selected_list_price
+    #     if self.selected_list_cat is not None:
+    #         result['cat'] = self.selected_list_cat
+    #     if self.selected_list_brand is not None:
+    #         result['brand'] = self.selected_list_brand
+    #     return result
+
     def __init__(self):
-        self.sort = request.form.get("sort")
-        if self.sort is None:
-            self.sort = request.args.get('sort')
-        if self.sort is not None:
-            self.sort = int(self.sort)
+        # self.selected_sort = request.form.get("sort")
+        # if self.selected_sort is None:
+        self.selected_sort = request.args.get('sort')
+        if self.selected_sort is not None:
+            self.selected_sort = int(self.selected_sort)
         # print("self.sort", self.sort)
         brand = request.form.getlist('brand')
         print('brand', brand)
@@ -164,7 +176,7 @@ class Filter:
     def list_price(self):
         if self._list_price is None:
             self._list_price = [ 
-                    {"name": "All prices", "id": -1},
+                    # {"name": "All prices", "id": -1},
                     {"name": "<no price>", "id": 0},
                     {"name": "below $5", "id": 1},
                     {"name": "$5 to $10", "id": 2},
@@ -241,56 +253,56 @@ class Filter:
             else:
                 self._count = 1
         return self._count
-    def as_str(self, sort=None, brand=None, price=None):
-        if sort is None:
-            sort = self.sort
-        if brand is None:
-            brand = self.selected_list_brand_as_str
-        if price is None:
-            price = self.selected_list_price_as_str
-        params = []
-        if sort is not None and sort != "":
-            params.append( f"sort={sort}")
-        if brand is not None and brand != "":
-            params.append( f"brand={brand}")
-        if price is not None and price != "":
-            params.append( f"price={price}")
-        if len(params) == 0:
-            return ""
-        else:
-            return "?" + "&".join(params)
-    def with_sort(self, sort):
-        return self.as_str(sort=sort)
-    def without_sort(self, sort):
-        return self.as_str(sort="")
-    def with_brand(self, id):
-        if self.selected_list_brand_as_str is None:
-            brand = f"{id}"
-        else:
-            brand = f"{self.selected_list_brand_as_str},{id}"
-        return self.as_str(brand=brand)
-    def without_brand(self, id):
-        brand = ""
-        if len(self.selected_list_brand) > 0:
-            selected_list_brand = list(builtins.filter(lambda x: (x != id), self.selected_list_brand))
-            if len(selected_list_brand) > 0:
-                brand = ",".join(map(lambda x: str(x), selected_list_brand))
-        return self.as_str(brand=brand)
-    def with_price(self, id):
-        if id < 0:
-            price = ""
-        elif self.selected_list_price_as_str is None:
-            price = f"{id}"
-        else:
-            price = f"{self.selected_list_price_as_str},{id}"
-        return self.as_str(price=price)
-    def without_price(self, id):
-        price = ""
-        if id < 0 and len(self.selected_list_price) == 0:
-            price = None
-        elif id >= 0 and len(self.selected_list_price) > 0:
-            selected_list_price = list(builtins.filter(lambda x: (x != id), self.selected_list_price))
-            if len(selected_list_price) > 0:
-                price = ",".join(map(lambda x: str(x), selected_list_price))
-        return self.as_str(price=price)
-
+    # def as_str(self, sort=None, brand=None, price=None):
+    #     if sort is None:
+    #         sort = self.selected_sort
+    #     if brand is None:
+    #         brand = self.selected_list_brand_as_str
+    #     if price is None:
+    #         price = self.selected_list_price_as_str
+    #     params = []
+    #     if sort is not None and sort != "":
+    #         params.append( f"sort={sort}")
+    #     if brand is not None and brand != "":
+    #         params.append( f"brand={brand}")
+    #     if price is not None and price != "":
+    #         params.append( f"price={price}")
+    #     if len(params) == 0:
+    #         return ""
+    #     else:
+    #         return "?" + "&".join(params)
+    # def with_sort(self, sort):
+    #     return self.as_str(sort=sort)
+    # def without_sort(self, sort):
+    #     return self.as_str(sort="")
+    # def with_brand(self, id):
+    #     if self.selected_list_brand_as_str is None:
+    #         brand = f"{id}"
+    #     else:
+    #         brand = f"{self.selected_list_brand_as_str},{id}"
+    #     return self.as_str(brand=brand)
+    # def without_brand(self, id):
+    #     brand = ""
+    #     if len(self.selected_list_brand) > 0:
+    #         selected_list_brand = list(builtins.filter(lambda x: (x != id), self.selected_list_brand))
+    #         if len(selected_list_brand) > 0:
+    #             brand = ",".join(map(lambda x: str(x), selected_list_brand))
+    #     return self.as_str(brand=brand)
+    # def with_price(self, id):
+    #     if id < 0:
+    #         price = ""
+    #     elif self.selected_list_price_as_str is None:
+    #         price = f"{id}"
+    #     else:
+    #         price = f"{self.selected_list_price_as_str},{id}"
+    #     return self.as_str(price=price)
+    # def without_price(self, id):
+    #     price = ""
+    #     if id < 0 and len(self.selected_list_price) == 0:
+    #         price = None
+    #     elif id >= 0 and len(self.selected_list_price) > 0:
+    #         selected_list_price = list(builtins.filter(lambda x: (x != id), self.selected_list_price))
+    #         if len(selected_list_price) > 0:
+    #             price = ",".join(map(lambda x: str(x), selected_list_price))
+    #     return self.as_str(price=price)
+    #

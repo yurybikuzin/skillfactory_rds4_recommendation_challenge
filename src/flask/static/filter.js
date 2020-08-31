@@ -137,23 +137,24 @@ function ulClick(event) {
     }
 }
 
-function filterClick() {
+function applyFilter() {
     const header = document.querySelector('body > header')
     const footer = document.querySelector('body > footer')
     const h1 = document.querySelector('h1')
-    // const filter_params = filter
-    // const filter_params_original = filter_original
     const filter_elem = document.getElementById('filter')
+    const main = document.querySelector('body > main')
     if (filter_elem.dataset.state == "closed") {
         const rect = filter_elem.getBoundingClientRect()
         let cssText = 'top: -' + Math.round(rect.top) + 'px'
         header.style.cssText = cssText
+        main.style.cssText = cssText
         footer.style.cssText = cssText
         h1.style.cssText = cssText
         filter_elem.style.cssText = cssText + '; max-height: 100vh; height: 100vh'
         setTimeout(function(){
             cssText = cssText + '; display: none'
             header.style.cssText = cssText
+            main.style.cssText = cssText
             footer.style.cssText = cssText
             h1.style.cssText = cssText
             filter_elem.style.cssText = 'position: static'
@@ -170,32 +171,68 @@ function filterClick() {
         const cssTop = header.style.cssText.split(';')[0]
         const cssText = cssTop + '; display: block'
         header.style.cssText = cssText
+        main.style.cssText = cssText
         footer.style.cssText = cssText
         h1.style.cssText = cssText
         filter_elem.style.cssText = cssTop + '; transition: top 0s; position: relative'
         setTimeout(function() {
             header.style.cssText = ''
+            main.style.cssText = ''
             footer.style.cssText = ''
             h1.style.cssText = ''
             filter_elem.style.cssText = ''
             filter_elem.dataset.state = "closed"
-            setTimeout(function() {
-                // console.log('send request', filter, filter_original)
-                const params = []
-                for (const name in filter) {
-                    const value = filter[name]
-                    if (value instanceof Set) {
-                        const values = Array.from(value)
-                        if (values.length > 0) {
-                            params.push(name + '=' + values.join(','))
-                        }
-                    } else {
-                        params.push(name + '=' + value)
+            const props_filter = new Set(Object.getOwnPropertyNames(filter))
+            const props_filter_original = new Set(Object.getOwnPropertyNames(filter_original))
+            console.log(props_filter, props_filter_original)
+            let is_changed = is_diff_sets(props_filter, props_filter_original)
+            if (!is_changed) {
+                for (const prop of props_filter) {
+                    console.log(prop, filter[prop], filter_original[prop])
+                    if (is_diff_sets(filter[prop], filter_original[prop])) {
+                        is_changed = true
+                        break
                     }
-                    console.log(name, value)
                 }
-                window.location.href = '/?' + params.join('&')
-            }, 500)
+            }
+            if (is_changed) {
+                setTimeout(function() {
+                    const params = []
+                    for (const name in filter) {
+                        const value = filter[name]
+                        if (value instanceof Set) {
+                            const values = Array.from(value)
+                            if (values.length > 0) {
+                                params.push(name + '=' + values.join(','))
+                            }
+                        } else {
+                            params.push(name + '=' + value)
+                        }
+                        console.log(name, value)
+                    }
+                    window.location.href = '/?' + params.join('&')
+                }, 500)
+            }
         }, 1)
     }
+}
+
+function clearFilter() {
+    console.log('clearFilter')
+}
+
+function is_diff_sets(setA, setB) {
+    if (!(setA instanceof Set)) setA = new Set([setA])
+    if (!(setB instanceof Set)) setB = new Set([setB])
+    for (const item of setA) {
+        if (!setB.has(item)) {
+            return true
+        }
+    }
+    for (const item of setB) {
+        if (!setA.has(item)) {
+            return true
+        }
+    }
+    return false
 }

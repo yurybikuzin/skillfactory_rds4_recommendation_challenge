@@ -22,12 +22,38 @@ body > footer,
 
 /* =============================================== */
 
+#filter-button {
+    cursor: pointer;
+    flex-grow: 0 !important;
+    background-color: #fef8f2;
+    height: 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: .5px solid #e77600;
+    border-radius: 7px;
+    padding: 9px;
+    margin: 0 8px;
+    box-sizing: border-box;
+    color: rgb(15, 17, 17);
+    text-size-adjust: 100%;
+}
+
+.colored {
+    color: rgb(196, 85, 0);
+}
+
+#filter-button .colored {
+    margin-left: 4px;
+}
+
+
+/* =============================================== */
+
 #filter > header {
     flex: 0 0 44px;
-    /* flex-grow: 0; */
     display: flex;
     align-items: center;
-    /* height: 44px; */
     background-color: rgba(0,0,0,.03);
     border-bottom: .1rem solid rgba(0,0,0,.05);
     box-shadow: 0 0.1rem 0 rgba(0,0,0,.03) inset, 0 0.1rem 0 rgba(255,255,255,.3);

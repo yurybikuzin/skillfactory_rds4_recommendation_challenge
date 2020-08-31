@@ -44,7 +44,6 @@ create table item (
     brand_id integer,
     description_id integer,
     title_id integer,
-    -- main_cat_id integer,
     price integer,
     is_train integer not null
 );
@@ -64,11 +63,6 @@ create table dic_title (
     id integer primary key not null,
     value text not null unique
 );
--- drop table if exists dic_main_cat;
--- create table dic_main_cat (
---     id integer primary key not null,
---     value text not null unique
--- );
 drop table if exists category;
 create table category (
     id integer primary key not null,

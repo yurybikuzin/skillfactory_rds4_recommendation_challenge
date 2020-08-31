@@ -1,0 +1,75 @@
+body > header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+body > header > .logo-wrapper {
+    flex: 1 1 100px;
+}
+
+body > header > .logo-wrapper > .logo {
+    display: block;
+    position: relative;
+    margin-left: 16px;
+    background-image: url(/static/icons2.png);
+    background-size: 275px;
+    background-position: -10px -50px;
+    width: 80px;
+    height: 27px;
+}
+
+body > header > .logo-wrapper > .logo > .i {
+    position: absolute;
+    color: white;
+    right: 13.5px;
+    top: -3.5px;
+    font-size: 18px;
+    font-weight: 1000;
+    background-color: rgb(19,25,33);
+    width: 11px;
+    text-align: center;
+}
+
+body > header > .logo-wrapper > .logo > .i2 {
+    position: absolute;
+    color: white;
+    right: 12px;
+    top: -3.5px;
+    font-size: 18px;
+    font-weight: 1000;
+    width: 11px;
+    text-align: center;
+}
+
+body > header > .logo-wrapper > .logo > .apostrophi {
+    position: absolute;
+    color: white;
+    right: -5.5px;
+    top: -3.5px;
+    font-size: 18px;
+    font-weight: 1000;
+}
+
+body > header > .cart {
+    display: block;
+    position: relative;
+    background-image: url(/static/icons2.png);
+    background-size: 275px;
+    background-position: -10px -240px;
+    background-repeat: no-repeat;
+    width: 37px;
+    height: 27px;
+    margin-right: 16px;
+}
+
+body > header > .cart > .count {
+    color: #f90;
+    font-weight: 700;
+    font-size: 15px;
+    text-align: center;
+    width: 30px;
+    left: 6px;
+    top: -3px;
+    position: absolute;
+}

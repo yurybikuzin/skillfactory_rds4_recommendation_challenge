@@ -3,8 +3,8 @@
     <ul onclick="ulClick(event)"
         data-name='sort' 
         data-data='{{ filter.list_sort() | tojson }}'
-        {% if filter.selected_sort is not none %}
-        data-selected='{{ filter.selected_sort | tojson }}'
+        {% if filter._selected_sort is not none %}
+        data-selected='{{ filter._selected_sort | tojson }}'
         {% endif %}
     >
     </ul>
@@ -17,8 +17,8 @@
         data-name='cat' 
         data-type="multi"
         data-height-max='0.2'
-        {% if filter.selected_list_cat is not none %}
-        data-selected='{{ filter.selected_list_cat | tojson }}'
+        {% if filter._selected_list_cat is not none %}
+        data-selected='{{ filter._selected_list_cat | tojson }}'
         {% endif %}
         data-all="All Categories"
         data-data='{{ filter.list_cat() | tojson }}'
@@ -33,8 +33,8 @@
         data-type="multi"
         data-all="All Prices"
         data-name='price' 
-        {% if filter.selected_list_price is not none %}
-        data-selected='{{ filter.selected_list_price | tojson }}'
+        {% if filter._selected_list_price is not none %}
+        data-selected='{{ filter._selected_list_price | tojson }}'
         {% endif %}
     ></ul>
 </section>
@@ -48,8 +48,8 @@
         data-type="multi"
         data-all="All Brands"
         data-name='brand' 
-        {% if filter.selected_list_brand is not none %}
-        data-selected='{{ filter.selected_list_brand | tojson }}'
+        {% if filter._selected_list_brand is not none %}
+        data-selected='{{ filter._selected_list_brand | tojson }}'
         {% endif %}
     ></ul>
 </section>

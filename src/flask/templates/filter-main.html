@@ -14,14 +14,14 @@
     <header>Category <sup>{{ filter.list_cat_len() }}<sup></header>
     <ul 
         onclick="ulClick(event)" 
-        data-data='{{ filter.list_cat() | tojson }}'
-        data-height-max='0.2'
-        data-type="multi"
-        data-all="All Categories"
         data-name='cat' 
-        {% if filter.selected_sort is not none %}
+        data-type="multi"
+        data-height-max='0.2'
+        {% if filter.selected_list_cat is not none %}
         data-selected='{{ filter.selected_list_cat | tojson }}'
         {% endif %}
+        data-all="All Categories"
+        data-data='{{ filter.list_cat() | tojson }}'
     ></ul>
 </section>
 
@@ -33,7 +33,7 @@
         data-type="multi"
         data-all="All Prices"
         data-name='price' 
-        {% if filter.selected_sort is not none %}
+        {% if filter.selected_list_price is not none %}
         data-selected='{{ filter.selected_list_price | tojson }}'
         {% endif %}
     ></ul>
@@ -48,7 +48,7 @@
         data-type="multi"
         data-all="All Brands"
         data-name='brand' 
-        {% if filter.selected_sort is not none %}
+        {% if filter.selected_list_brand is not none %}
         data-selected='{{ filter.selected_list_brand | tojson }}'
         {% endif %}
     ></ul>

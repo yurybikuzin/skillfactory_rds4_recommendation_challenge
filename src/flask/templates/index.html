@@ -3,19 +3,42 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Amazing.com: Grocery & Gouurmet Food</title>
-    <link rel="stylesheet" type="text/css" href="/static/style.css"></style>
+    <title>Amazing.com: Grocery &amp; Gourmet Food</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css"/>
     <meta name="viewport" content="width=device-width, maximum-scale=1, minimum-scale=1, initial-scale=1, user-scalable=no, shrink-to-fit=no">
     <script src="/static/filter.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/filter.css"></style>
+    <link rel="stylesheet" type="text/css" href="/static/filter.css">
 </head>
 
 <body>
 
 <header></header>
 
-<h1 class="padded">Groceries & Gourmet Food</h1>
+<h1 class="padded">Groceries &amp; Gourmet Food</h1>
 <div id="filter" data-state="closed">{% include 'filter.html' %}</div>
+<main>
+    <ul>
+    {% for item in filter.list_item() %}
+    <li class="item">
+        <a href="/item/{{item.itemid}}{{filter.as_str()}}">
+            <div class="image-wrapper">
+                <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN={{item.asin}}&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=SL250" alt="{{item.title}}"/>
+            </div>
+            <div class="content">
+                <div class="title">{{item.title}}</div>
+                {% if item.price is not none %}
+                    <div class="price">
+                        <span class="symbol">$</span>
+                        <span class="whole">{{ item.price_whole }}</span>
+                        <span class="fraction">{{ item.price_fraction }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </a>
+    </li>
+    {% endfor %}
+    </ul>
+</main>
 
 <footer></footer>
 

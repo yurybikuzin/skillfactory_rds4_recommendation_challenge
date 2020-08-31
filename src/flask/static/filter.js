@@ -8,10 +8,10 @@ function prepareFilterSections() {
         const list_item = JSON.parse(ul.dataset.data)
         const height_client = document.documentElement.clientHeight
         const height_max = height_client * parseFloat(ul.dataset.heightMax)
+        const name = ul.dataset.name
 
         if (ul.dataset.selected) {
-            let json = JSON.parse(list_item.dataset.selected)
-            const name = list_item.dataset.name
+            let json = JSON.parse(ul.dataset.selected)
             if (Array.isArray(json)) {
                 filter[name] = new Set(json)
                 filter_original[name] = new Set(json)
@@ -23,10 +23,7 @@ function prepareFilterSections() {
 
         let is_truncated = false
         for (let item of list_item) {
-            const el = document.createElement("li")
-            el.dataset.id = item.id
-            el.innerText = item.name
-            ul.appendChild(el)
+            const li = appendLiFromItem(ul, item, name)
             if (ul.getBoundingClientRect().height > height_max) {
                 ul.removeChild(ul.lastChild)
                 is_truncated = true
@@ -44,10 +41,30 @@ function prepareFilterSections() {
     })
 }
 
+function appendLiFromItem(ul, item, name) {
+    const li = document.createElement("li")
+    li.dataset.id = item.id
+    li.innerText = item.name
+    if (filter.hasOwnProperty(name)) {
+        if (filter[name] instanceof Set) {
+            if (filter[name].has(item.id + '')) {
+                li.dataset.selected = 'true'
+            }
+        } else {
+            if (filter[name] == item.id) {
+                li.dataset.selected = 'true'
+            }
+        }
+    }
+    ul.appendChild(li)
+    return li
+}
+
 function showMoreClick(event) {
     const label = event.target
     const ul = label.parentElement.nextElementSibling
     if (label.dataset.state == 'less') {
+        const name = ul.dataset.name
         const list_item = JSON.parse(ul.dataset.data)
         const skip_count = ul.children.length
         let i = 0
@@ -55,10 +72,7 @@ function showMoreClick(event) {
             if (i < skip_count) {
                 i++
             } else {
-                const el = document.createElement("li")
-                el.dataset.id = item.id
-                el.innerText = item.name
-                ul.appendChild(el)
+                appendLiFromItem(ul, item, name)
             }
         }
         label.dataset.lessCount = skip_count
@@ -85,10 +99,11 @@ function showMoreClick(event) {
     }
 }
 
-function ulClick(event, name) {
+function ulClick(event) {
     if (event.target.tagName == "LI") {
         const li = event.target
         const ul = li.parentElement
+        const name = ul.dataset.name
         const id_selected = li.dataset.id
         if (ul.dataset.type == 'multi') {
             const id_current = filter[name]
@@ -126,23 +141,25 @@ function filterClick() {
     const header = document.querySelector('body > header')
     const footer = document.querySelector('body > footer')
     const h1 = document.querySelector('h1')
-    const filter = document.getElementById('filter')
-    if (filter.dataset.state == "closed") {
-        const rect = filter.getBoundingClientRect()
+    // const filter_params = filter
+    // const filter_params_original = filter_original
+    const filter_elem = document.getElementById('filter')
+    if (filter_elem.dataset.state == "closed") {
+        const rect = filter_elem.getBoundingClientRect()
         let cssText = 'top: -' + Math.round(rect.top) + 'px'
         header.style.cssText = cssText
         footer.style.cssText = cssText
         h1.style.cssText = cssText
-        filter.style.cssText = cssText + '; max-height: 100vh; height: 100vh'
+        filter_elem.style.cssText = cssText + '; max-height: 100vh; height: 100vh'
         setTimeout(function(){
             cssText = cssText + '; display: none'
             header.style.cssText = cssText
             footer.style.cssText = cssText
             h1.style.cssText = cssText
-            filter.style.cssText = 'position: static'
-            filter.dataset.state = "opened"
+            filter_elem.style.cssText = 'position: static'
+            filter_elem.dataset.state = "opened"
         }, 500)
-        fetch('/filter-main')
+        fetch('/filter-main' + window.location.search)
             .then((response) => response.text())
             .then((text) => {
                 const main = document.querySelector('#filter > main')
@@ -155,14 +172,30 @@ function filterClick() {
         header.style.cssText = cssText
         footer.style.cssText = cssText
         h1.style.cssText = cssText
-        filter.style.cssText = cssTop + '; transition: top 0s; position: relative'
+        filter_elem.style.cssText = cssTop + '; transition: top 0s; position: relative'
         setTimeout(function() {
             header.style.cssText = ''
             footer.style.cssText = ''
             h1.style.cssText = ''
-            filter.style.cssText = ''
-            filter.dataset.state = "closed"
-            console.log('send request', filter)
+            filter_elem.style.cssText = ''
+            filter_elem.dataset.state = "closed"
+            setTimeout(function() {
+                // console.log('send request', filter, filter_original)
+                const params = []
+                for (const name in filter) {
+                    const value = filter[name]
+                    if (value instanceof Set) {
+                        const values = Array.from(value)
+                        if (values.length > 0) {
+                            params.push(name + '=' + values.join(','))
+                        }
+                    } else {
+                        params.push(name + '=' + value)
+                    }
+                    console.log(name, value)
+                }
+                window.location.href = '/?' + params.join('&')
+            }, 500)
         }, 1)
     }
 }

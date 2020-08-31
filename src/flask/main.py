@@ -28,53 +28,43 @@ def script():
     filter = Filter()
     return render_template('script.js', filter=filter)
 
-# @app.route("/", methods=["GET", "POST"])
 @app.route("/")
 def index():
-    # print(request.form)
-    # print( jsonify(request.get_json(force=True)) )
     filter = Filter()
-    # cur = get_db().cursor()
-    # cur.execute('''
-    #     select 
-    #         count(*) 
-    #     from item 
-    # ''')
-    # (count_item,) = cur.fetchone()
-
-    # cur.execute('''
-    #     select 
-    #         grouped.category_id,
-    #         grouped.count,
-    #         dic_category.value
-    #     from (
-    #         select 
-    #    		category_id,
-    #    		count(*) as count
-    #         from category
-    #         group by category_id
-    #     ) as grouped
-    #     left join dic_category
-    #         on grouped.category_id = dic_category.id
-    #    	where grouped.count < 10000
-    #    	order by grouped.count desc
-    # ''')
-    # list_category = list(map(lambda row: { "id": row[0], "count": row[1],"name": row[2] }, cur.fetchall()))
-    # count_category = len(list_category)
-    # return render_template('index.html', count_item=count_item, count_category=count_category, list_category=list_category)
     return render_template('index.html', filter=filter)
 
-# @app.route("/", methods=["POST"])
-# def index():
-#     filter = Filter()
-#     print( jsonify(request.get_json(force=True)) )
-#     return render_template('index.html', filter=filter)
+def list_item(where, limit=None):
+    sql = f'''
+        select 
+            item.itemid,
+            itemid_asin.asin,
+            dic_title.value,
+            item.price
+        from item 
+        left join itemid_asin on
+            item.itemid = itemid_asin.itemid
+        left join dic_title on
+            item.title_id = dic_title.id
+        {f'where item.itemid == {where}' if limit is None else '' if where is None or where == '' else f'where {where}'}
+        {'' if limit is None else f'limit {limit}'}
+    '''
+    print(sql)
+    cur = get_db().cursor()
+    cur.execute(sql)
+    return list(map(lambda row: { 
+        "itemid": row[0], 
+        "asin": row[1], 
+        "title": row[2], 
+        "price": row[3], 
+        "price_whole": None if row[3] is None else row[3] // 100,
+        "price_fraction": None if row[3] is None else "{:02d}".format(row[3] - row[3] // 100 * 100),
+        }, [cur.fetchone()] if limit is None else cur.fetchall()))
 
-
-# @app.route('/cat/<category_id>')
-# def cat(category_id):
-#     cat = Cat(category_id)
-#     return render_template('cat.html', cat=cat)
+@app.route("/item/<itemid>")
+def item(itemid):
+    filter = Filter()
+    [item] = list_item(itemid)
+    return render_template('item.html', item=item, filter=filter)
 
 
 @app.route('/filter-main')
@@ -82,85 +72,33 @@ def filter():
     filter = Filter()
     return render_template('filter-main.html', filter=filter)
 
-# class Cat:
-#     _list_sort = None
-#     def __init__(self, category_id):
-#         cur = get_db().cursor()
-#         self.filter = Filter(category_id)
-#         self.category_id = category_id
-#         cur.execute(f'''
-#             select 
-#                 {self.category_id} as category_id,
-#                 grouped.count,
-#                 dic_category.value
-#             from (
-#                 select 
-#                     category_id,
-#                     count(*) as count
-#                 from category
-#                 where category_id = {self.category_id}
-#                 group by category_id
-#             ) as grouped
-#             left join dic_category
-#                 on grouped.category_id = dic_category.id
-#             where grouped.count < 10000
-#             order by grouped.count desc
-#         ''')
-#         (self.id, self.count, self.name) = cur.fetchone()
-#     def list_sort(self):
-#         if self._list_sort is None:
-#             self._list_sort = [ 
-#                     {"name": "Price: Low to High", "id": 1},
-#                     {"name": "Price: High to Low", "id": 2},
-#                     {"name": "PriceAvg. Customer Review", "id": 3},
-#                     ]
-#         return self._list_sort
-
 import builtins
 class Filter: 
     _list_sort = None
     _list_brand = None
     _list_cat = None
     _list_price = None
+    _list_item = None
     selected_list_brand = []
     selected_list_brand_as_str = None
     selected_list_price = []
     selected_list_price_as_str = None
+    selected_list_cat = []
+    selected_list_cat_as_str = None
     _found = None
     _count = None
-    # def as_dict(self):
-    #     result = {}
-    #     if self.selected_sort is not None:
-    #         result['sort'] = self.selected_sort
-    #     if self.selected_list_price is not None:
-    #         result['price'] = self.selected_list_price
-    #     if self.selected_list_cat is not None:
-    #         result['cat'] = self.selected_list_cat
-    #     if self.selected_list_brand is not None:
-    #         result['brand'] = self.selected_list_brand
-    #     return result
-
     def __init__(self):
-        # self.selected_sort = request.form.get("sort")
-        # if self.selected_sort is None:
         self.selected_sort = request.args.get('sort')
         if self.selected_sort is not None:
             self.selected_sort = int(self.selected_sort)
-        # print("self.sort", self.sort)
-        brand = request.form.getlist('brand')
-        print('brand', brand)
-        if len(brand) > 0:
-            self.selected_list_brand = list(map(lambda x: int(x), brand))
+        brand = request.args.get('brand')
+        if brand is not None: 
+            self.selected_list_brand = list(map(lambda x: int(x), brand.split(",")))
             self.selected_list_brand_as_str = ",".join(map(lambda x: str(x), self.selected_list_brand))
-        else:
-            brand = request.args.get('brand')
-            if brand is not None: 
-                self.selected_list_brand = list(map(lambda x: int(x), brand.split(",")))
-                self.selected_list_brand_as_str = ",".join(map(lambda x: str(x), self.selected_list_brand))
         cat = request.args.get('cat')
         if cat is not None: 
-            self.selected_list_cat = list(map(lambda x: int(x), cat.split(",")))
-            self.selected_list_cat_as_str = ",".join(map(lambda x: str(x), self.selected_list_cat))
+            self.selected_list_cat = cat.split(",")
+            self.selected_list_cat_as_str = ",".join(self.selected_list_cat)
         price = request.args.get('price')
         if price is not None: 
             self.selected_list_price = list(map(lambda x: int(x), price.split(",")))
@@ -190,6 +128,11 @@ class Filter:
         return len(self.list_brand())
     def list_cat_len(self):
         return len(self.list_cat())
+    def list_item(self):
+        if self._list_item is None:
+            where = ''
+            self._list_item = list_item(where, '1,10')
+        return self._list_item
     def list_cat(self):
         if self._list_cat is None:
             cur = get_db().cursor()
@@ -248,29 +191,36 @@ class Filter:
         return self._found
     def count(self):
         if self._count is None:
-            if len(self.selected_list_brand) == 0:
-                self._count = 0
-            else:
-                self._count = 1
+            self._count = 0
+            if len(self.selected_list_brand) > 0:
+                self._count += 1
+            if len(self.selected_list_cat) > 0:
+                self._count += 1
+            if len(self.selected_list_price) > 0:
+                self._count += 1
         return self._count
-    # def as_str(self, sort=None, brand=None, price=None):
-    #     if sort is None:
-    #         sort = self.selected_sort
-    #     if brand is None:
-    #         brand = self.selected_list_brand_as_str
-    #     if price is None:
-    #         price = self.selected_list_price_as_str
-    #     params = []
-    #     if sort is not None and sort != "":
-    #         params.append( f"sort={sort}")
-    #     if brand is not None and brand != "":
-    #         params.append( f"brand={brand}")
-    #     if price is not None and price != "":
-    #         params.append( f"price={price}")
-    #     if len(params) == 0:
-    #         return ""
-    #     else:
-    #         return "?" + "&".join(params)
+    def as_str(self, sort=None, price=None, cat=None, brand=None):
+        if sort is None:
+            sort = self.selected_sort
+        if price is None:
+            price = self.selected_list_price_as_str
+        if cat is None:
+            cat = self.selected_list_cat_as_str
+        if brand is None:
+            brand = self.selected_list_brand_as_str
+        params = []
+        if sort is not None and sort != "":
+            params.append( f"sort={sort}")
+        if price is not None and price != "":
+            params.append( f"price={price}")
+        if cat is not None and cat != "":
+            params.append( f"cat={cat}")
+        if brand is not None and brand != "":
+            params.append( f"brand={brand}")
+        if len(params) == 0:
+            return ""
+        else:
+            return "?" + "&".join(params)
     # def with_sort(self, sort):
     #     return self.as_str(sort=sort)
     # def without_sort(self, sort):

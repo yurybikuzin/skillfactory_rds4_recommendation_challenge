@@ -11,21 +11,6 @@
 </section>
 
 <section>
-    <header>Category <sup>{{ filter.list_cat_len() }}<sup></header>
-    <ul 
-        onclick="ulClick(event)" 
-        data-name='cat' 
-        data-type="multi"
-        data-height-max='0.2'
-        {% if filter._selected_list_cat is not none %}
-        data-selected='{{ filter._selected_list_cat | tojson }}'
-        {% endif %}
-        data-all="All Categories"
-        data-data='{{ filter.list_cat() | tojson }}'
-    ></ul>
-</section>
-
-<section>
     <header>Prices</header>
     <ul 
         onclick="ulClick(event)" 
@@ -40,11 +25,26 @@
 </section>
 
 <section>
+    <header>Category <sup>{{ filter.list_cat_len() }}<sup></header>
+    <ul 
+        onclick="ulClick(event)" 
+        data-name='cat' 
+        data-type="multi"
+        data-height-max='0.5'
+        {% if filter._selected_list_cat is not none %}
+        data-selected='{{ filter._selected_list_cat | tojson }}'
+        {% endif %}
+        data-all="All Categories"
+        data-data='{{ filter.list_cat() | tojson }}'
+    ></ul>
+</section>
+
+<section>
     <header>Brand <sup>{{ filter.list_brand_len() }}<sup></header>
     <ul 
         onclick="ulClick(event)" 
         data-data='{{ filter.list_brand() | tojson }}'
-        data-height-max='0.2'
+        data-height-max='1'
         data-type="multi"
         data-all="All Brands"
         data-name='brand' 

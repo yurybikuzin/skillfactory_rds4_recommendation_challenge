@@ -30,7 +30,7 @@ def filter():
 @app.route("/item/<itemid>")
 def item(itemid):
     filter = Filter()
-    [item] = list_item(itemid)
+    item = list_item(itemid)
     return render_template('item.html', item=item, filter=filter)
 
 import builtins
@@ -92,7 +92,7 @@ class Filter:
             self._list_sort = [ 
                     {"name": "Price: Low to High", "id": 0, 'sql': 'item.price asc'},
                     {"name": "Price: High to Low", "id": 1, 'sql': 'item.price desc'},
-                    {"name": "Avg. Customer Review", "id": 2},
+                    {"name": "Avg. Customer Review", "id": 2, 'sql': 'overall_avg desc'},
                     ]
         return self._list_sort
     def list_price(self):
@@ -180,7 +180,6 @@ class Filter:
                     group by item.itemid
                 )
             '''
-            print(sql)
             cur = get_db().cursor()
             cur.execute(sql)
             (found,) = cur.fetchone()
@@ -281,7 +280,9 @@ def list_item(where, limit=None, sort=None):
             dic_title.value,
             item.price,
             dic_description.value,
-            dic_brand.value
+            dic_brand.value,
+            avg(overall) as overall_avg,
+            count(overall)
         from item 
         left join category 
             on item.itemid = category.itemid
@@ -293,15 +294,32 @@ def list_item(where, limit=None, sort=None):
             item.description_id = dic_description.id
         left join dic_brand on
             item.brand_id = dic_brand.id
+        left join train on
+        	item.itemid = train.itemid
         {f'where item.itemid in ({where})' if limit is None else '' if where is None or where == '' else f'where {where}'}
         group by item.itemid
         { '' if sort is None else f'order by {sort}'}
         { '' if limit is None else f'limit {limit}'}
     '''
-    print(sql)
     cur = get_db().cursor()
     cur.execute(sql)
-    return list(map(lambda row: { 
+    if limit is not None:
+        return list(map(list_item_row, cur.fetchall()))
+    else:
+        return list(map(list_item_row, cur.fetchall()))[0]
+
+def list_item_row(row):
+    stars_pos = None
+    if row[6] is not None:
+        stars = round(row[6] * 2)
+        if (stars % 2) == 0:
+            stars = stars // 2
+            base = -5
+        else:
+            stars = (stars + 1) // 2
+            base = -175
+        stars_pos = base - (5 - stars) * 15
+    return { 
         "itemid": row[0], 
         "asin": row[1], 
         "title": row[2], 
@@ -310,6 +328,8 @@ def list_item(where, limit=None, sort=None):
         "price_fraction": None if row[3] is None else "{:02d}".format(row[3] - row[3] // 100 * 100),
         "description": '' if row[4] is None else row[4],
         "brand": row[5],
-        }, cur.fetchall()))
-
+        "stars_pos": stars_pos,
+        "overall_avg": None if row[6] is None else round(row[6], 1),
+        "overall_count": row[7],
+        }
 

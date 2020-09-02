@@ -3,11 +3,16 @@ let filter = { }
 let filter_original = { }
 
 function prepareFilterSections() {
+    const header_elem = document.querySelector("#filter > header")
+    const footer_elem = document.querySelector("#filter > footer")
+    const main_elem = document.querySelector("#filter > main")
     const list_ul = document.querySelectorAll("#filter > main > section > ul[data-data]")
     list_ul.forEach(ul => {
         const list_item = JSON.parse(ul.dataset.data)
-        const height_client = document.documentElement.clientHeight
-        const height_max = height_client * parseFloat(ul.dataset.heightMax)
+        const height_stop = !ul.dataset.heightMax ? null : (
+            document.documentElement.clientHeight -
+            (header_elem.clientHeight + footer_elem.clientHeight + (ul.getBoundingClientRect().top - main_elem.getBoundingClientRect().top))
+        ) * parseFloat(ul.dataset.heightMax)
         const name = ul.dataset.name
 
         if (ul.dataset.selected) {
@@ -20,11 +25,10 @@ function prepareFilterSections() {
                 filter_original[name] = json
             }
         }
-
         let is_truncated = false
         for (let item of list_item) {
             const li = appendLiFromItem(ul, item, name)
-            if (ul.getBoundingClientRect().height > height_max) {
+            if (height_stop && ul.clientHeight > height_stop) {
                 ul.removeChild(ul.lastChild)
                 is_truncated = true
                 break
@@ -151,6 +155,7 @@ function applyFilter() {
         footer.style.cssText = cssText
         h1.style.cssText = cssText
         filter_elem.style.cssText = cssText + '; max-height: 100vh; height: 100vh'
+        document.querySelector('#filter > footer').style.cssText = 'display: flex'
         setTimeout(function(){
             cssText = cssText + '; display: none'
             header.style.cssText = cssText
@@ -175,6 +180,7 @@ function applyFilter() {
         footer.style.cssText = cssText
         h1.style.cssText = cssText
         filter_elem.style.cssText = cssTop + '; transition: top 0s; position: relative'
+        document.querySelector('#filter > footer').style.cssText = ''
         setTimeout(function() {
             header.style.cssText = ''
             main.style.cssText = ''
@@ -184,11 +190,9 @@ function applyFilter() {
             filter_elem.dataset.state = "closed"
             const props_filter = new Set(Object.getOwnPropertyNames(filter))
             const props_filter_original = new Set(Object.getOwnPropertyNames(filter_original))
-            console.log(props_filter, props_filter_original)
             let is_changed = is_diff_sets(props_filter, props_filter_original)
             if (!is_changed) {
                 for (const prop of props_filter) {
-                    console.log(prop, filter[prop], filter_original[prop])
                     if (is_diff_sets(filter[prop], filter_original[prop])) {
                         is_changed = true
                         break
@@ -196,6 +200,8 @@ function applyFilter() {
                 }
             }
             if (is_changed) {
+                const main_elem = document.querySelector('body > main')
+                main_elem.innerHTML = ''
                 setTimeout(function() {
                     const params = []
                     for (const name in filter) {

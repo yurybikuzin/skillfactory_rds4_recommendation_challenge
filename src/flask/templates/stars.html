@@ -1,0 +1,13 @@
+{% if item.stars_pos is not none %}
+<div class="overall">
+    <div class="avg">
+    {{item.overall_avg}}
+    </div>
+    <div class="stars" style="
+        background-position: {{item.stars_pos}}px -368px;
+    "></div>
+    <div class="count">
+    {{item.overall_count}}
+    </div>
+</div>
+{% endif %}

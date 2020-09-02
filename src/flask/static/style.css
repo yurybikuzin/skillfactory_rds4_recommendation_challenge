@@ -163,3 +163,26 @@ nav > a.disabled {
     background: #fff;
 }
 
+.overall {
+    display: flex;
+    align-items: center;
+}
+
+.overall > .stars {
+    width: 80px;
+    height: 18px;
+    background-image: url(/static/icons.png);
+    background-size: 400px 900px;
+    background-repeat: no-repeat;
+}
+.overall > .avg {
+    margin-right: 8px;
+    font-size: 13px;
+    color: #565959;
+}
+
+.overall > .count {
+    margin-left: 8px;
+    font-size: 13px;
+    color: #565959;
+}

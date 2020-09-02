@@ -7,96 +7,12 @@
     <link rel="stylesheet" type="text/css" href="/static/style.css"/>
     <meta name="viewport" content="width=device-width, maximum-scale=1, minimum-scale=1, initial-scale=1, user-scalable=no, shrink-to-fit=no">
     <link rel="stylesheet" type="text/css" href="/static/header.css">
-    <style>
-
-h1 {
-    margin: 8px;
-    font-size: 18px;
-}
-
-@media (max-width: 375px) { 
-    div.content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    img {
-        display: block;
-        margin: 8px;
-        max-width:250px;
-        max-height:250px;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-    }
-    .textual {
-        display: flex;
-        width: 100%;
-        flex-direction: column;
-        align-items: center;
-    }
-}
-
-@media (min-width: 376px) { 
-    div.content {
-        display: flex;
-        flex-wrap: wrap;
-        flex-direction: row;
-    }
-    img {
-        display: block;
-        margin: 8px;
-        max-width:250px;
-        max-height:250px;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-    }
-    .textual {
-        flex: 1 1 33%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-}
-
-
-
-
-.button {
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 177px;
-    height: 47px;
-    color: #111;
-    background: linear-gradient(to bottom,#f7dfa5,#f0c14b);
-    border-color: #a88734 #9c7e31 #846a29;
-    font-size: 16px;
-    margin-top: 8px;
-    margin-bottom: 16px;
-}
-.price {
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 8px;
-    font-size: 15px;
-}
-
-.description {
-    font-size: 13px;
-}
-
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="/static/item.css">
 </head>
 
 <body>
 
 {% include 'header.html' %}
-<nav>
-</nav>
 
 <main>
 
@@ -118,8 +34,11 @@ h1 {
         onerror="this.src='/static/no_image.png'"/>
 
         <div class="textual">
+
+        {% include 'stars.html' %}
+
         {% if item.price is not none %}
-            <div class="price padded">
+            <div class="price">
                 <span class="caption">Price:</span>
                 <span class="symbol">$</span
                 ><span class="whole">{{ item.price_whole }}</span
@@ -129,7 +48,7 @@ h1 {
         {% endif %}
 
         {% if item.description|length > 1 %}
-            <div class="description padded">{{item.description}}</div>
+            <div class="description">{{item.description}}</div>
         {% endif %}
 
         {% if item.itemid in filter._selected_list_cart %}

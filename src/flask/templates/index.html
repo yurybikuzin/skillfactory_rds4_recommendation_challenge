@@ -61,15 +61,12 @@
             <li class="item">
                 <a href="/item/{{item.itemid}}{{filter.as_str()}}">
                     <div class="image-wrapper">
-                        <img src="https://ws-na.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=US&ASIN={{item.asin}}&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=SL250" alt="{{item.title}}" onerror="this.src='/static/no_image.png'"/>
+
+                        {% include 'image.html' %}
                     </div>
                     <div class="content">
 
-                        {% if item.title|length > 100 %}
-                        <div class="title">&lt;No title&gt;</div>
-                        {% else %}
-                        <div class="title">{{item.title}}</div>
-                        {% endif %}
+                        <div class="title">{% include 'title.html' %}</div>
 
                         {% include 'stars.html' %}
 

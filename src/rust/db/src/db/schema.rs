@@ -45,13 +45,6 @@ table! {
 }
 
 table! {
-    dic_main_cat (id) {
-        id -> Integer,
-        value -> Text,
-    }
-}
-
-table! {
     dic_reviewer_name (id) {
         id -> Integer,
         value -> Text,
@@ -108,6 +101,7 @@ table! {
         verified -> Integer,
         unix_review_time -> Integer,
         reviewer_name_id -> Nullable<Integer>,
+        review_text -> Nullable<Text>,
         summary_id -> Nullable<Integer>,
         vote -> Nullable<Integer>,
     }
@@ -120,7 +114,6 @@ allow_tables_to_appear_in_same_query!(
     dic_category,
     dic_description,
     dic_image,
-    dic_main_cat,
     dic_reviewer_name,
     dic_summary,
     dic_title,

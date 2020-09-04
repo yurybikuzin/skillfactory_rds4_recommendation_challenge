@@ -41,6 +41,7 @@ pub struct RecordTrain {
     pub reviewer_name_id: Option<i32>,
     pub summary_id: Option<i32>,
     pub vote: Option<i32>,
+    pub review_text: Option<String>,
     // pub style: Option<String>,
     // pub image: Option<String>,
     pub userid: i32,
@@ -100,6 +101,7 @@ pub struct Train {
     pub verified: String,
     pub unix_review_time: u64,
     pub reviewer_name: Option<String>,
+    pub review_text: Option<String>,
     pub summary: Option<String>,
     pub vote: Option<String>,
     pub style: Option<String>,
@@ -479,6 +481,7 @@ async fn main() -> Result<()> {
                         let userid = record.userid as i32;
                         let rating = record.rating as i32;
                         let overall = record.overall as i32;
+                        let review_text = record.review_text;
                         let verified: i32 = if record.verified == "True" { 1 } else { 0 };
                         let unix_review_time = record.unix_review_time as i32;
                         let reviewer_name_id =
@@ -528,6 +531,7 @@ async fn main() -> Result<()> {
                             userid,
                             itemid,
                             rating,
+                            review_text,
                         });
                     }
                 }
@@ -589,6 +593,7 @@ async fn main() -> Result<()> {
                     rating: &vec_chunk[i].rating,
                     overall: &vec_chunk[i].overall,
                     verified: &vec_chunk[i].verified,
+                    review_text: vec_chunk[i].review_text.as_deref(),
                     unix_review_time: &vec_chunk[i].unix_review_time,
                     reviewer_name_id: opt_ref!(vec_chunk[i].reviewer_name_id),
                     summary_id: opt_ref!(vec_chunk[i].summary_id),

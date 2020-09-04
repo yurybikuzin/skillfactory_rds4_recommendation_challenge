@@ -100,3 +100,8 @@ but this solves problem:
 sudo apt-get install -y libsqlite3-dev
 ```
 
+## Подготовка данных для flask
+
+```
+./db.bash
+```

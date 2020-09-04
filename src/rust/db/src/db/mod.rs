@@ -10,8 +10,8 @@ pub use models::{
     NewDicReviewerName, NewDicSummary, NewDicTitle, NewImage, NewItem, NewItemidAsin, NewTrain,
 };
 pub use schema::{
-    also_view, category, dic_brand, dic_category, dic_description, dic_image, dic_main_cat,
-    dic_reviewer_name, dic_summary, dic_title, image, item, itemid_asin, train,
+    also_view, category, dic_brand, dic_category, dic_description, dic_image, dic_reviewer_name,
+    dic_summary, dic_title, image, item, itemid_asin, train,
 };
 // use schema::train::dsl::*;
 

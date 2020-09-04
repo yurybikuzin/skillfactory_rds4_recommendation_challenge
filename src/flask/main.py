@@ -1,5 +1,5 @@
 import sqlite3
-from flask import Flask, render_template, request, jsonify, g
+from flask import Flask, render_template, request, jsonify, g, redirect
 
 app = Flask(__name__)
 
@@ -29,9 +29,11 @@ def filter():
 
 @app.route("/item/<itemid>")
 def item(itemid):
-    filter = Filter()
-    item = list_item(itemid)
-    return render_template('item.html', item=item, filter=filter)
+    filter = Filter(itemid)
+    if not filter.is_review:
+        return render_template('item.html', filter=filter)
+    else:
+        return render_template('review.html', filter=filter)
 
 import builtins
 class Filter: 
@@ -40,6 +42,7 @@ class Filter:
     _list_cat = None
     _list_price = None
     _list_item = None
+    _list_review = None
     _selected_list_brand = []
     _selected_list_brand_as_str = None
     _selected_list_price = []
@@ -51,10 +54,12 @@ class Filter:
     _found = None
     _count = None
     _per_page = 20
+    _per_page_review = 20
     _where = None
     _sort = None
-    def __init__(self):
+    def __init__(self, itemid=None):
         self.is_cart = request.args.get('is_cart')
+        self.is_review = request.args.get('is_review')
 
         self._selected_start = request.args.get('start')
         if self._selected_start is not None:
@@ -63,6 +68,14 @@ class Filter:
             self._selected_start = 0
         self.start_prev = self._selected_start - self._per_page
         self.start_next = self._selected_start + self._per_page
+
+        self._selected_start_review = request.args.get('start_review')
+        if self._selected_start_review is not None:
+            self._selected_start_review = int(self._selected_start_review)
+        else:
+            self._selected_start_review = 0
+        self.start_prev_review = self._selected_start_review - self._per_page_review
+        self.start_next_review = self._selected_start_review + self._per_page_review
 
         self._selected_sort = request.args.get('sort')
         if self._selected_sort is not None:
@@ -87,12 +100,22 @@ class Filter:
         if cart is not None: 
             self._selected_list_cart = list(map(lambda x: int(x), cart.split(",")))
             self._selected_list_cart_as_str = ",".join(map(lambda x: str(x), self._selected_list_cart))
+        if itemid is not None:
+            [self.item] = list_item(itemid)
+    def list_review(self):
+        if self._list_review is None:
+            if self.item is not None:
+                self._list_review = list_review(self.item["itemid"], str(self._selected_start_review) + ',' + str(self._per_page_review))
+        return self._list_review
     def list_sort(self):
         if self._list_sort is None:
             self._list_sort = [ 
                     {"name": "Price: Low to High", "id": 0, 'sql': 'item.price asc'},
                     {"name": "Price: High to Low", "id": 1, 'sql': 'item.price desc'},
-                    {"name": "Avg. Customer Review", "id": 2, 'sql': 'overall_avg desc'},
+                    {"name": "Avg. Customer Review: High to Low", "id": 2, 'sql': 'overall_avg desc'},
+                    {"name": "Avg. Customer Review: Low to High", "id": 3, 'sql': 'overall_avg asc'},
+                    {"name": "Customer Review Count: High to Low", "id": 4, 'sql': 'overall_count desc'},
+                    {"name": "Customer Review Count: Low to High", "id": 5, 'sql': 'overall_count asc'},
                     ]
         return self._list_sort
     def list_price(self):
@@ -127,6 +150,10 @@ class Filter:
         return self.start_prev < 0
     def is_eof(self):
         return self.start_next >= self.found()
+    def is_bof_review(self): 
+        return self.start_prev_review < 0
+    def is_eof_review(self):
+        return self.start_next_review >= self.item["overall_count"]
     def list_cat(self):
         if self._list_cat is None:
             cur = get_db().cursor()
@@ -219,11 +246,15 @@ class Filter:
             if len(self._selected_list_price) > 0:
                 self._count += 1
         return self._count
-    def as_str(self, is_cart=None, start=None, sort=None, price=None, cat=None, brand=None, cart=None):
+    def as_str(self, is_cart=None, start=None, sort=None, price=None, cat=None, brand=None, cart=None, start_review=None, is_review=None):
         if is_cart is None:
             is_cart = self.is_cart
+        if is_review is None:
+            is_review = self.is_review
         if start is None:
             start = self._selected_start
+        if start_review is None:
+            start = self._selected_start_review
         if sort is None:
             sort = self._selected_sort
         if price is None:
@@ -237,8 +268,12 @@ class Filter:
         params = []
         if is_cart:
             params.append( f"is_cart=1")
+        if is_review:
+            params.append( f"is_review=1")
         if start is not None and start != "" and start != "0":
             params.append( f"start={start}")
+        if start_review is not None and start_review is not False and start != "" and start != "0":
+            params.append( f"start_review={start_review}")
         if sort is not None and sort != "":
             params.append( f"sort={sort}")
         if price is not None and price != "":
@@ -282,7 +317,7 @@ def list_item(where, limit=None, sort=None):
             dic_description.value,
             dic_brand.value,
             avg(overall) as overall_avg,
-            count(overall)
+            count(*) / (select count(*) from category where category.itemid = item.itemid) as overall_count
         from item 
         left join category 
             on item.itemid = category.itemid
@@ -303,22 +338,9 @@ def list_item(where, limit=None, sort=None):
     '''
     cur = get_db().cursor()
     cur.execute(sql)
-    if limit is not None:
-        return list(map(list_item_row, cur.fetchall()))
-    else:
-        return list(map(list_item_row, cur.fetchall()))[0]
+    return list(map(list_item_row, cur.fetchall()))
 
 def list_item_row(row):
-    stars_pos = None
-    if row[6] is not None:
-        stars = round(row[6] * 2)
-        if (stars % 2) == 0:
-            stars = stars // 2
-            base = -5
-        else:
-            stars = (stars + 1) // 2
-            base = -175
-        stars_pos = base - (5 - stars) * 15
     return { 
         "itemid": row[0], 
         "asin": row[1], 
@@ -328,8 +350,69 @@ def list_item_row(row):
         "price_fraction": None if row[3] is None else "{:02d}".format(row[3] - row[3] // 100 * 100),
         "description": '' if row[4] is None else row[4],
         "brand": row[5],
-        "stars_pos": stars_pos,
+        "stars_pos": stars_pos(row[6]),
         "overall_avg": None if row[6] is None else round(row[6], 1),
         "overall_count": row[7],
+        }
+
+def list_review(itemid, limit):
+    sql = f'''
+         select 
+            train.userid,
+            train.overall,
+            train.verified,
+            train.unix_review_time,
+            dic_reviewer_name.value,
+            dic_summary.value,
+            train.vote,
+            train.review_text,
+            images.images
+        from train
+        left outer join dic_reviewer_name on 
+            train.reviewer_name_id = dic_reviewer_name.id
+        left outer join dic_summary on 
+            train.summary_id = dic_summary.id
+        left outer join (
+            select 
+                image.train_id as train_id, 
+                group_concat(dic_image.value) as images
+            from image
+            left join dic_image on image.image_id = dic_image.id
+            group by image.train_id
+        ) images on train.id = images.train_id
+        {f'where train.itemid = {itemid}'}
+        order by train.unix_review_time desc
+        {f'limit {limit}'}
+    '''
+    cur = get_db().cursor()
+    cur.execute(sql)
+    return list(map(list_review_row, cur.fetchall()))
+
+def stars_pos(overall):
+    if overall is None:
+        return None
+    else:
+        stars = round(overall * 2)
+        if (stars % 2) == 0:
+            stars = stars // 2
+            base = -5
+        else:
+            stars = (stars + 1) // 2
+            base = -175
+        return base - (5 - stars) * 16
+
+import datetime
+def list_review_row(row):
+    return { 
+        "userid": row[0], 
+        "overall": row[1], 
+        "stars_pos": stars_pos(row[1]),
+        "verified": row[2], 
+        "time": datetime.datetime.fromtimestamp(row[3]).strftime(' %B %d, %Y'), 
+        "name": row[4],
+        "summary": row[5],
+        "vote": row[6],
+        "text": row[7],
+        "list_image": None if row[8] is None else row[8].split(','),
         }
 

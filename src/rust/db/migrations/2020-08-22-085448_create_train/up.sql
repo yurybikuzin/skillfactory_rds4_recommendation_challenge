@@ -9,6 +9,7 @@ create table train (
     verified integer not null,
     unix_review_time integer not null,
     reviewer_name_id integer,
+    review_text text,
     summary_id integer,
     vote integer
 );
@@ -70,7 +71,7 @@ create table category (
     category_id integer not null,
     is_train integer not null
 );
-create index category on category(category_id);
+create index category_id on category(category_id);
 drop table if exists dic_category;
 create table dic_category (
     id integer primary key not null,

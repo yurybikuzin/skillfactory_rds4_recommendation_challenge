@@ -33,6 +33,7 @@ pub struct NewTrain<'a> {
     pub reviewer_name_id: Option<&'a i32>,
     pub summary_id: Option<&'a i32>,
     pub vote: Option<&'a i32>,
+    pub review_text: Option<&'a str>,
     // pub style: Option<String>,
 }
 

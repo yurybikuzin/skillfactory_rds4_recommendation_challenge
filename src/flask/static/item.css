@@ -82,3 +82,24 @@ h1 {
 .description {
     font-size: 13px;
 }
+
+h2 {
+    margin: 0 8px;
+}
+
+.unix_review_time {
+    font-size: 12px;
+}
+
+.content .overall {
+    color: #0066C0 !important;
+    cursor: pointer;
+}
+.content .overall span {
+    display: block;
+    margin-left: 4px;
+    font-size: 13px;
+    text-decoration: underline;
+}
+
+

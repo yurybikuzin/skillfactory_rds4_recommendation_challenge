@@ -2,14 +2,9 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>Amazing.com: Grocery &amp; Gourmet Food</title>
-    <link rel="stylesheet" type="text/css" href="/static/style.css"/>
-    <meta name="viewport" content="width=device-width, maximum-scale=1, minimum-scale=1, initial-scale=1, user-scalable=no, shrink-to-fit=no">
-    <script src="/static/filter.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/filter.css">
-    <link rel="stylesheet" type="text/css" href="/static/header.css">
+    {% include 'head.html' %}
 {% if filter.is_cart %}
+    <title>Cart :: Amazing.com: Grocery &amp; Gourmet Food</title>
     <style>
         .empty { 
             text-align: center; 
@@ -17,6 +12,10 @@
             font-weight: 700;
         }
     </style>
+{% else %}
+    <title>Amazing.com: Grocery &amp; Gourmet Food</title>
+    <script src="/static/filter.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/filter.css">
 {% endif %}
 </head>
 
@@ -68,7 +67,9 @@
 
                         <div class="title">{% include 'title.html' %}</div>
 
-                        {% include 'stars.html' %}
+                        <div class="overall">
+                            {% include 'stars.html' %}
+                        </div>
 
                         {% if item.price is not none %}
                             <div class="price">

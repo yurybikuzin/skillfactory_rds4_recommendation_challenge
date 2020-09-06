@@ -174,7 +174,6 @@ nav > a.disabled {
 .stars {
     width: 80px;
     height: 18px;
-    background-image: url(/static/icons.png);
     background-size: 400px 900px;
     background-repeat: no-repeat;
 }

@@ -141,7 +141,8 @@ function ulClick(event) {
     }
 }
 
-function applyFilter() {
+function applyFilter(urlFilterMain, urlSearch) {
+    console.log('url')
     const header = document.querySelector('body > header')
     const footer = document.querySelector('body > footer')
     const h1 = document.querySelector('h1')
@@ -165,7 +166,8 @@ function applyFilter() {
             filter_elem.style.cssText = 'position: static'
             filter_elem.dataset.state = "opened"
         }, 500)
-        fetch('/filter-main' + window.location.search)
+        url = urlFilterMain + window.location.search
+        fetch(url)
             .then((response) => response.text())
             .then((text) => {
                 const main = document.querySelector('#filter > main')
@@ -216,7 +218,7 @@ function applyFilter() {
                         }
                         console.log(name, value)
                     }
-                    window.location.href = '/?' + params.join('&')
+                    window.location.href = urlSearch + params.join('&')
                 }, 500)
             }
         }, 1)

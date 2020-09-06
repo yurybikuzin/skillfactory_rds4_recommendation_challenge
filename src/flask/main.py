@@ -1,7 +1,38 @@
 import sqlite3
-from flask import Flask, render_template, request, jsonify, g, redirect
+from flask import Blueprint, Flask, render_template, request, jsonify, g, redirect
 
+bp = Blueprint('root', __name__, template_folder='templates', static_folder='static')
+
+@bp.route("/")
+def index():
+    filter = Filter()
+    return render_template('index.html', filter=filter)
+
+@bp.route('/filter-main')
+def filter():
+    filter = Filter()
+    return render_template('filter-main.html', filter=filter)
+
+@bp.route("/item/<itemid>")
+def item(itemid):
+    filter = Filter(itemid)
+    if not filter.is_review:
+        return render_template('item.html', filter=filter)
+    else:
+        return render_template('review.html', filter=filter)
+
+import os
 app = Flask(__name__)
+app_root = os.environ.get('APP_ROOT')
+if app_root is None: 
+    app_root = ''
+app.register_blueprint(bp, url_prefix='/' + app_root)
+
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
 
 DATABASE = 'data/flask.db'
 
@@ -10,30 +41,6 @@ def get_db():
     if db is None:
         db = g._database = sqlite3.connect(DATABASE)
     return db
-
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        db.close()
-
-@app.route("/")
-def index():
-    filter = Filter()
-    return render_template('index.html', filter=filter)
-
-@app.route('/filter-main')
-def filter():
-    filter = Filter()
-    return render_template('filter-main.html', filter=filter)
-
-@app.route("/item/<itemid>")
-def item(itemid):
-    filter = Filter(itemid)
-    if not filter.is_review:
-        return render_template('item.html', filter=filter)
-    else:
-        return render_template('review.html', filter=filter)
 
 import builtins
 class Filter: 
@@ -57,6 +64,7 @@ class Filter:
     _per_page_review = 20
     _where = None
     _sort = None
+    item = None
     def __init__(self, itemid=None):
         self.is_cart = request.args.get('is_cart')
         self.is_review = request.args.get('is_review')
@@ -68,6 +76,7 @@ class Filter:
             self._selected_start = 0
         self.start_prev = self._selected_start - self._per_page
         self.start_next = self._selected_start + self._per_page
+        # print(self.start_prev, self._selected_start, self._per_page)
 
         self._selected_start_review = request.args.get('start_review')
         if self._selected_start_review is not None:
@@ -138,7 +147,18 @@ class Filter:
         return len(self.list_cat())
     def list_item(self):
         if self._list_item is None:
-            if self.is_cart:
+            if self.item is not None:
+                import pickle
+                with open('data/item_embeddings.pickle','rb') as file:
+                    item_embeddings = pickle.load(file)
+                import nmslib
+                nms_idx_loaded = nmslib.init(method='hnsw', space='cosinesimil')
+                nms_idx_loaded.loadIndex('data/nms.idx', False)
+                itemid = self.item["itemid"]
+                nbm = builtins.filter(lambda a: a != itemid, nms_idx_loaded.knnQuery(item_embeddings[int(itemid)], k=11)[0])
+                print(itemid, nbm)
+                self._list_item = list_item(",".join(map(lambda a: str(a), nbm)))
+            elif self.is_cart:
                 if len(self._selected_list_cart) > 0:
                     self._list_item = list_item(self._selected_list_cart_as_str)
             else:
@@ -254,7 +274,7 @@ class Filter:
         if start is None:
             start = self._selected_start
         if start_review is None:
-            start = self._selected_start_review
+            start_review = self._selected_start_review
         if sort is None:
             sort = self._selected_sort
         if price is None:
@@ -270,9 +290,10 @@ class Filter:
             params.append( f"is_cart=1")
         if is_review:
             params.append( f"is_review=1")
-        if start is not None and start != "" and start != "0":
+        if start is not None and start != 0:
             params.append( f"start={start}")
-        if start_review is not None and start_review is not False and start != "" and start != "0":
+        print(start, params)
+        if start_review is not None and start_review != 0:
             params.append( f"start_review={start_review}")
         if sort is not None and sort != "":
             params.append( f"sort={sort}")
@@ -285,9 +306,11 @@ class Filter:
         if cart is not None and cart != "":
             params.append( f"cart={cart}")
         if len(params) == 0:
-            return ""
+            result = ""
         else:
-            return "?" + "&".join(params)
+            result = "?" + "&".join(params)
+        print(result)
+        return result
     def with_item_in_cart(self, id):
         if self._selected_list_cart_as_str is None:
             cart = f"{id}"

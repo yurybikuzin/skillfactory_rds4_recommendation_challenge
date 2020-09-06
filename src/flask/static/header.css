@@ -12,7 +12,6 @@ body > header > .logo-wrapper > .logo {
     display: block;
     position: relative;
     margin-left: 16px;
-    background-image: url(/static/icons2.png);
     background-size: 275px;
     background-position: -10px -50px;
     width: 80px;
@@ -54,7 +53,6 @@ body > header > .logo-wrapper > .logo > .apostrophi {
 body > header > .cart {
     display: block;
     position: relative;
-    background-image: url(/static/icons2.png);
     background-size: 275px;
     background-position: -10px -240px;
     background-repeat: no-repeat;

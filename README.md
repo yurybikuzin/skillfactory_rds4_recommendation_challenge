@@ -1,6 +1,17 @@
 ![Title PNG "Skill Factory"](/assets/skillfactory_logo.png)
 # Проект №4. Рекомендательные системы
 
+:
+<!-- vim-markdown-toc Redcarpet -->
+
+* [Задача](#задача)
+* [Участие в совместной работе](#участие-в-совместной-работе)
+* [Структура репозитория](#структура-репозитория)
+* [Запуск Jupyter-ноутбука в docker-контейнере](#запуск-jupyter-ноутбука-в-docker-контейнере)
+
+<!-- vim-markdown-toc -->
+
+
 ## Задача
 
 https://www.kaggle.com/c/recommendationsv4/overview
@@ -94,3 +105,38 @@ Url из последней строки вывода (в приведенном
 ![Изображение Jupyter-ноутбука](assets/jupyter-notebook-work.png "Изображение Jupyter-ноутбука")
 
 
+## Build
+
+```
+./docker-image.sh prod flask
+```
+
+## Test before deploy
+
+```
+docker rm flask && docker run -it --name flask -e PORT=9000 -p 4242:9000 bazawinner/prod-recommend-flask:7
+```
+
+## Deploy
+
+```
+sudo snap install heroku --classic
+heroku login
+heroku container:login
+mkdir ~/recommend_deploy
+cd ~/recommend_deploy
+heroku create
+```
+obscure-lowlands-91451
+
+```
+git init
+heroku git:remote -a obscure-lowlands-91451
+```
+
+```
+docker tag bazawinner/prod-recommend-flask:7 registry.heroku.com/obscure-lowlands-91451/web
+docker push registry.heroku.com/obscure-lowlands-91451/web
+heroku container:release web
+heroku open
+```

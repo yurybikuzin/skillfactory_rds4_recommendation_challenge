@@ -14,22 +14,25 @@
     </style>
 {% else %}
     <title>Amazing.com: Grocery &amp; Gourmet Food</title>
-    <script src="/static/filter.js"></script>
-    <link rel="stylesheet" type="text/css" href="/static/filter.css">
+    <script src="{{url_for('root.static', filename='filter.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{url_for('root.static', filename='filter.css')}}">
 {% endif %}
+{% include 'image_style.html' %}
 </head>
 
 <body>
 
 {% include 'header.html' %}
 
-{% if not filter.is_cart %}
+{% if filter.is_cart %}
+<h1 class="padded">Your Cart at Groceries &amp; Gourmet Food</h1>
+{% else %}
 <h1 class="padded">Groceries &amp; Gourmet Food</h1>
 <div id="filter" data-state="closed">
     <header class="padded">
         <div>Found {{ filter.found() }} results</div> 
 
-        <label id="filter-button" onclick="applyFilter()">
+        <label id="filter-button" onclick="applyFilter( '{{url_for('root.filter')}}', '{{url_for('root.index') + "?"}}' )">
             <div>Filters</div>
             {% if filter.count() > 0 %}
                 <div class="colored">({{filter.count()}})</div>
@@ -51,14 +54,15 @@
 <main>
     {% if filter.list_item() is none %}
         {% if filter.is_cart %}
-            <img src="/static/empty_cart.svg"/>
+            <img src="{{url_for('root.static', filename='empty_cart.svg')}}"/>
             <div class="empty">Your Cart is empty</div>
         {% endif %}
     {% else %}
+
         <ul>
         {% for item in filter.list_item() %}
             <li class="item">
-                <a href="/item/{{item.itemid}}{{filter.as_str()}}">
+                <a href="{{ url_for('root.item', itemid=item.itemid) + filter.as_str() }}">
                     <div class="image-wrapper">
 
                         {% include 'image.html' %}
@@ -98,14 +102,14 @@
                 {% if filter.is_bof() %}
                 class="disabled"
                 {% else %}
-                href="{{filter.as_str(start=filter.start_prev)}}"
+                href="{{url_for('root.index') + filter.as_str(start=filter.start_prev)}}"
                 {% endif %}
             >← Previous</a>
             <a 
                 {% if filter.is_eof() %}
                 class="disabled"
                 {% else %}
-                href="{{filter.as_str(start=filter.start_next)}}"
+                href="{{url_for('root.index') + filter.as_str(start=filter.start_next)}}"
                 {% endif %}
             >Next →</a>
         </nav>

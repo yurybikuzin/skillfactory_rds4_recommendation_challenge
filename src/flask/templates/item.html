@@ -5,7 +5,8 @@
 <head>
     {% include 'head.html' %}
     <title>{% include 'title.html'%} :: Amazing.com: Grocery &amp; Gourmet Food</title>
-    <link rel="stylesheet" type="text/css" href="/static/item.css">
+    <link rel="stylesheet" type="text/css" href="{{url_for('root.static', filename='item.css')}}">
+    {% include 'image_style.html' %}
 </head>
 
 <body>
@@ -23,7 +24,7 @@
 
             <div class="textual">
 
-                <a class="overall" href="/item/{{item.itemid}}{{filter.as_str(is_review=True)}}">
+                <a class="overall" href="{{url_for('root.item', itemid=item.itemid) + filter.as_str(is_review=True)}}">
                 {% include 'stars.html' %}
                 <span>reviews</span>
             </a>
@@ -43,17 +44,55 @@
             {% endif %}
 
             {% if item.itemid in filter._selected_list_cart %}
-                <a class="button" href="/{{filter.without_item_in_cart(item.itemid)}}#{{item.itemid}}">
+                <a class="button" href="{{url_for('root.index') + filter.without_item_in_cart(item.itemid)}}#{{item.itemid}}">
                     <div class="caption">Remove from Cart</div>
                 </a>
             {% else %}
-                <a class="button" href="/{{filter.with_item_in_cart(item.itemid)}}#{{item.itemid}}">
+                <a class="button" href="{{url_for('root.index') + filter.with_item_in_cart(item.itemid)}}#{{item.itemid}}">
                     <div class="caption">Add to Cart</div>
                 </a>
             {% endif %}
             </div>
         </div>
     </div>
+
+    <h2>We recommend</h2>
+
+    <ul>
+    {% for item in filter.list_item() %}
+        <li class="item">
+            <a href="{{url_for('root.item', itemid=item.itemid) + filter.as_str()}}">
+                <div class="image-wrapper">
+
+                    {% include 'image.html' %}
+                </div>
+                <div class="content">
+
+                    <div class="title">{% include 'title.html' %}</div>
+
+                    <div class="overall">
+                        {% include 'stars.html' %}
+                    </div>
+
+                    {% if item.price is not none %}
+                        <div class="price">
+                            <span class="symbol">$</span>
+                            <span class="whole">{{ item.price_whole }}</span>
+                            <span class="fraction">{{ item.price_fraction }}</span>
+                        </div>
+                    {% endif %}
+                    {% if item.description|length > 1 %}
+                        {% if item.description|length < 100 %}
+                        <div class="description">{{item.description}}</div>
+                        {% else %}
+                        <div class="description to-be-continue" >{{item.description|truncate(100)}}</div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </a>
+        </li>
+    {% endfor %}
+    </ul>
 </main>
 
 <footer></footer>

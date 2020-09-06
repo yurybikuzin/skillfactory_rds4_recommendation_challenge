@@ -5,115 +5,11 @@
 <head>
     {% include 'head.html' %}
     <title>{% include 'title.html'%} :: Amazing.com: Grocery &amp; Gourmet Food</title>
-    <link rel="stylesheet" type="text/css" href="/static/item.css">
-    <script async defer src="/static/gallery.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{url_for('root.static', filename='review.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('root.static', filename='gallery.css')}}">
+    <script async defer src="{{url_for('root.static', filename='gallery.js')}}"></script>
+    {% include 'image_style.html' %}
 </head>
-
-<style>
-a.back-to-item {
-    position: relative;
-    display: block;
-    /* height: 47px; */
-    padding: 14px 14px 13px 28px;
-    /* box-sizing: border-box; */
-    font-size: 15px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    line-height: 1.35;
-    text-decoration: none;
-    color: #111;
-    font-weight: bold;
-    background-color: rgba(0,0,0,.03);
-    border-bottom: .1rem solid rgba(0,0,0,.05);
-    box-shadow: 0 0.1rem 0 rgba(0,0,0,.03) inset, 0 0.1rem 0 rgba(255,255,255,.3);
-}
-a.back-to-item i {
-    display: block;
-    position: absolute;
-    top: 50%;
-    margin-top: -5px;
-    left: 13px;
-    background-image: url(/static/icons.png);
-    width: 9px;
-    height: 11px;
-    background-position: -88px -86px;
-    background-size: 400px 900px;
-    background-repeat: no-repeat;
-    opacity: .64;
-}
-
-h1 {
-    margin-top: 16px;
-    font-size: 22px;
-}
-.reviewer {
-    display: flex;
-    align-items: center;
-    line-height: 1;
-    font-size: 15px;
-    color: #111;
-}
-.reviewer img {
-    width: 34px;
-    height: 34px;
-    margin: 0;
-    border-radius: 34px;
-    border: 2px solid #FFF;
-    box-sizing: border-box;
-    margin-right: 9px;
-}
-
-.review .overall {
-    display: block;
-}
-.review .overall .stars {
-    display: inline-block;
-}
-.verified[data-verified="1"]:after {
-    content: 'Verified Purchase';
-    font-size: 11px;
-    color: #c45500;
-    font-weight: 700;
-}
-.review .time {
-    font-size: 13px;
-    color: #565959;
-}
-.review .text {
-    font-size: 13px;
-}
-.gallery {
-    margin: 8px 0 0 16px;
-    width: 50%;
-    height: 150px;
-    --mini-height: 0px;
-    --counter-offset-bottom: 8px;
-    --arrow-size: 32px;
-    --zoom-in-icon-color: rgb(230,230,230,0.8);
-    --zoom-offset-top: 8px;
-    --zoom-offset-right: 8px;
-}
-.gallery[data-z] {
-    margin: 0;
-}
-.gallery img {
-    margin: 0;
-}
-ul {
-    margin-bottom: 16px;
-}
-.stars {
-    position: relative;
-    top: 4px;
-}
-.summary {
-    font-weight: 700;
-    font-size: 13px;
-    color: #0f1111;
-    line-height: 19px;
-}
-</style>
 
 <body>
 
@@ -159,16 +55,18 @@ ul {
                 {% if filter.is_bof_review() %}
                 class="disabled"
                 {% else %}
-                href="/item/{{item.itemid}}{{filter.as_str(start_review=filter.start_prev_review)}}"
+                href="{{url_for('root.item', itemid=item.itemid) + filter.as_str(start_review=filter.start_prev_review)}}"
                 {% endif %}
             >← Previous</a>
+                <!-- href="/item/{{item.itemid}}{{filter.as_str(start_review=filter.start_prev_review)}}" -->
             <a 
                 {% if filter.is_eof_review() %}
                 class="disabled"
                 {% else %}
-                href="/item/{{item.itemid}}{{filter.as_str(start_review=filter.start_next_review)}}"
+                href="{{url_for('root.item', itemid=item.itemid) + filter.as_str(start_review=filter.start_next_review)}}"
                 {% endif %}
             >Next →</a>
+                <!-- href="/item/{{item.itemid}}{{filter.as_str(start_review=filter.start_next_review)}}" -->
         </nav>
         {% endif %}
 

@@ -2,3 +2,7 @@ book_tags.csv filter=lfs diff=lfs merge=lfs -text
 books.csv filter=lfs diff=lfs merge=lfs -text
 ratings.csv filter=lfs diff=lfs merge=lfs -text
 tags_cleaned.csv filter=lfs diff=lfs merge=lfs -text
+books.csv.zip filter=lfs diff=lfs merge=lfs -text
+book_tags.csv.zip filter=lfs diff=lfs merge=lfs -text
+ratings.csv.zip filter=lfs diff=lfs merge=lfs -text
+tags_cleaned.csv.zip filter=lfs diff=lfs merge=lfs -text

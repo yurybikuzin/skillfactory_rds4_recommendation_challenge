@@ -1,0 +1,8 @@
+*
+!webapp
+!prod/flask/requirements.txt
+!prod/flask/uwsgi.ini
+!src/flask/main.py
+!src/flask/templates
+!src/flask/static
+!src/flask/data

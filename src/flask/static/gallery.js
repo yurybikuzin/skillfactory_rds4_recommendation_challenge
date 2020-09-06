@@ -1,7 +1,3 @@
-const elem = document.createElement('link')
-elem.setAttribute('rel', 'stylesheet')
-elem.setAttribute('type', 'text/css')
-elem.setAttribute('href', '/static/gallery.css')
 elem.onload = function() {
 'use strict'
 
@@ -15,15 +11,11 @@ for (const elem of document.querySelectorAll('.gallery')) {
         const de = document.documentElement
         const dim = Math.max(de.clientWidth, de.clientHeight)
         const size = round((dim - 640) / (1024 - 640)) ? '1024x768' : '640x480' 
-        // const mainCssText = 'width:' + len + '00%;'
         elem.style.setProperty('--image-width', (round(100000 / len) / 1000) + '%')
         elem.style.setProperty('--wrapper-main-width', len + '00%')
         const miniImgWidth = parseInt(getComputedStyle(elem).getPropertyValue('--mini-width'))
         const miniTotalWidth = len * miniImgWidth
         elem.style.setProperty('--wrapper-mini-width', miniTotalWidth + 'px')
-        // console.log(getComputedStyle(elem))
-        // console.log(miniImgWidth)
-        // console.log(elem.style.getPropertyValue('--zoom-size'))
         elem.innerHTML =
             '<div class="main">' + 
                 listUrl.map(url => '<img src="' + url + '"/>').join('') +
@@ -40,7 +32,6 @@ for (const elem of document.querySelectorAll('.gallery')) {
         const mini = main.nextElementSibling
         for (const i of mini.children) {
             i.addEventListener(eventNames[4], event => {
-                // mainStyle.cssText = mainCssText + "left:-" + event.target.dataset.i + "00%;"
                 mainStyle.cssText = "left:-" + event.target.dataset.i + "00%;"
             })
         }
@@ -113,13 +104,6 @@ for (const elem of document.querySelectorAll('.gallery')) {
                     j == 1 && (cssText += "left:" + (startLeft + delta) + "px")// touchmove
                     console.log({j, startLeft, delta, miniTotalWidth, clientWidth}, miniTotalWidth - clientWidth, cssText + (j < 2 ? ";transition:left 0s;" : "left:" + (startLeft + delta) + "px;"))
                     miniStyle.cssText = cssText + (j < 2 ? ";transition:left 0s;" : "left:" + Math.min(0, Math.max(clientWidth - miniTotalWidth, startLeft + delta)) + "px;")
-                    // console.log('here', eventNames[j], delta)
-                    // i
-                    // if (j == 1
-                    // if (j == 1 || j == 3) { // touchmove | touchend
-                    //     console.log(miniStyle.left, startLeft + delta + 'px')
-                    //     miniStyle.left = startLeft + delta + 'px'
-                    // }
                 }
             })
         }

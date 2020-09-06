@@ -22,7 +22,7 @@ ADD src/flask/static static
 COPY src/flask/main.py main.py
 COPY prod/flask/uwsgi.ini uwsgi.ini
 
-USER www-data
+# USER www-data
 
 # Run the app.  CMD is required to run on Heroku
 CMD uwsgi --ini uwsgi.ini

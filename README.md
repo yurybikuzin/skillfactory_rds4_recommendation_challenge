@@ -1,13 +1,18 @@
 ![Title PNG "Skill Factory"](/assets/skillfactory_logo.png)
 # Проект №4. Рекомендательные системы
 
-:
 <!-- vim-markdown-toc Redcarpet -->
 
 * [Задача](#задача)
-* [Участие в совместной работе](#участие-в-совместной-работе)
+* [Production-сервис](#production-сервис)
+    * [Как посмотреть?](#как-посмотреть)
+        * [На heroku.com](#на-heroku-com)
+        * [На собственном сервере](#на-собственном-сервере)
+        * [На локальной машине](#на-локальной-машине)
+    * [Описание](#описание)
+    * [Детали реализации](#детали-реализации)
+* [Инструкции](#инструкции)
 * [Структура репозитория](#структура-репозитория)
-* [Запуск Jupyter-ноутбука в docker-контейнере](#запуск-jupyter-ноутбука-в-docker-контейнере)
 
 <!-- vim-markdown-toc -->
 
@@ -16,28 +21,51 @@
 
 https://www.kaggle.com/c/recommendationsv4/overview
 
-## Участие в совместной работе
 
-Для участия в совместной работе надо:
+## Production-сервис
 
-- [зарегистрироваться на GitHub](https://github.com/join)
-- [установить и настроить Git](https://docs.github.com/en/github/getting-started-with-github/set-up-git): см. раздел "Setting up Git"
-- [установить Git LFS](https://www.git-tower.com/learn/git/ebook/en/command-line/advanced-topics/git-lfs): см. раздел "Installing Git LFS". Внимание! После установки Git LFS надо обязательно выполнить в терминале команду `git lfs install`
-- отправить в Slack сообщение [yury bikuzin](https://sfdatasciencecourse.slack.com/team/U016P0Y3CP7) с запросом на yчастие в совместной работе, в запросе необходимо указать свой логин на GitHub
+### Как посмотреть?
 
-- развернуть локальный репозиторий: 
+#### На heroku.com
 
-через https:
+https://obscure-lowlands-91451.herokuapp.com/
 
-```
-git clone https://github.com/yurybikuzin/skillfactory_rds4_recommendation_challenge.git
-```
+#### На собственном сервере
 
-или через ssh, если Вы [настроили доступ через SSH](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh), что позволяет не вводить свои логин и пароль при каждой отправке изменений в локальном репозитории на сервер:
+http://bikuzin18.baza-winner.ru:42420/ (работает стабильнее, чем на heroku, если работает)
+
+#### На локальной машине
+
+Лучшим вариантом знакомства с production-сервисом будет разворачиваине его на локальной машине следующей командой:
 
 ```
-git clone git@github.com:yurybikuzin/skillfactory_rds4_recommendation_challenge.git
+docker rm recommend; docker run -it --name recommend -e PORT=9000 -p 42420:9000 bazawinner/prod-recommend-flask:7
 ```
+
+Результат можно увидеть в браузере: http://localhost:42420
+
+### Описание
+
+Целью production-сервиса является демонстрация применения модели, полученной в результате решения [задачи](https://www.kaggle.com/c/recommendationsv4/overview)
+
+Поскольку модель для рекомендательной системы мы строим на основе отзывов пользователей на товары, то и рекомендовать мы будет товары пользоателю production-сервиса, а именно: когда пользователь просматривает карточку товара, то мы дополнительно на этой карточке показываем раздел "We recommend" ([например](https://obscure-lowlands-91451.herokuapp.com/item/20)), основываясь на анализе имющихся отзывов пользователей
+
+Рекомендации не являются персональными
+
+### Детали реализации
+
+- [Использованные технологии](production-stack.md)
+- [Страницы веб-сервиса и маршруты переходов](production-site-map.md)
+- [Описание архитектуры](production-architechture.md)
+- [Известные недочеты](known-issues.md)
+
+## Инструкции
+
+- [Для участия в совместной работе](collaboraion.md)
+- [Для запуска Jupyter-ноутбука в docker-контейнере](jupyter-in-docker.md)
+- [Для извлечения данных из `data/meta_Grocery_and_Gourmet_Food.json.zip`](src/rust/json-to-csv.md)
+- [Для подготовки данных для production-сервиса](src/rust/data-for-production.md)
+- [Для сборки и деплоя production-сервиса](go-to-production.md)
 
 ## Структура репозитория
 
@@ -50,93 +78,7 @@ git clone git@github.com:yurybikuzin/skillfactory_rds4_recommendation_challenge.
 - [nn-collab-filter.ipynb](nn-collab-filter.ipynb) - адаптированный ноутбук https://www.kaggle.com/abdualimov/nn-collab-filter с https://www.kaggle.com/c/recommendationsv4/notebooks
 - [yurybikuzin.ipynb](yurybikuzin.ipynb) - ноутбук [yury bikuzin](https://sfdatasciencecourse.slack.com/team/U016P0Y3CP7)
 
-## Запуск Jupyter-ноутбука в docker-контейнере
+В папке [books](books) находится [ноутбук](books/u6-p4-books.ipynb) созданный согласно [тренировочному заданию](https://lms.skillfactory.ru/courses/course-v1:Skillfactory+DST-8+13NOV2019/courseware/e3fc9ede1c074eb5819ad1932307daa9/0b9aff51b88044b5af4f860441df0cae/6?activate_block_id=block-v1%3ASkillfactory%2BDST-8%2B13NOV2019%2Btype%40vertical%2Bblock%40d49f77c3903f46ee92322ecb6d7c7ac8)
 
-После [установки Docker](https://docs.docker.com/engine/install/) (и выполнения, в случае Linux, [Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/)) надо в терминале перейти в корневую папку репозитория и выполнить команду:
+В папках `dev` и `prod` находятся Dockerfile'ы для создания необходимых образов
 
-В Windows Command Line (`cmd`):
-
-```
-docker run -m 4096m -p 8888:8888 -v %cd%:/home/jovyan/work bazawinner/dev-recommend-proj:7
-```
-
-В Windows Power Shell, macOS:
-
-```
-docker run -m 4096m -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:7
-```
-
-Про опцию `-m 4096m` [см. подробнее](https://stackoverflow.com/questions/43460770/docker-windows-container-memory-limit#:~:text=If%20you%20run%20docker%20containers,m%22%20option%20for%20docker%20run.)
-
-В linux:
-
-```
-docker run -p 8888:8888 -v ${PWD}:/home/jovyan/work bazawinner/dev-recommend-proj:7
-```
-
-После выполнения команды появиться подобный вывод:
-
-```
-Executing the command: jupyter notebook
-[I 10:53:34.456 NotebookApp] Writing notebook server cookie secret to /home/jovyan/.local/share/jupyter/runtime/notebook_cookie_secret
-[I 10:53:35.006 NotebookApp] JupyterLab extension loaded from /opt/conda/lib/python3.7/site-packages/jupyterlab
-[I 10:53:35.006 NotebookApp] JupyterLab application directory is /opt/conda/share/jupyter/lab
-[I 10:53:35.008 NotebookApp] Serving notebooks from local directory: /home/jovyan
-[I 10:53:35.008 NotebookApp] The Jupyter Notebook is running at:
-[I 10:53:35.008 NotebookApp] http://a7d8a2ffdd6e:8888/?token=ebfc449f52d47aea7a98db8c7a323710cf615e98ee21bcfc
-[I 10:53:35.008 NotebookApp]  or http://127.0.0.1:8888/?token=ebfc449f52d47aea7a98db8c7a323710cf615e98ee21bcfc
-[I 10:53:35.009 NotebookApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
-[C 10:53:35.011 NotebookApp] 
-    To access the notebook, open this file in a browser:
-        file:///home/jovyan/.local/share/jupyter/runtime/nbserver-7-open.html
-    Or copy and paste one of these URLs:
-        http://a7d8a2ffdd6e:8888/?token=ebfc449f52d47aea7a98db8c7a323710cf615e98ee21bcfc
-     or http://127.0.0.1:8888/?token=ebfc449f52d47aea7a98db8c7a323710cf615e98ee21bcfc
- ```
-
-Url из последней строки вывода (в приведенном примере это http://127.0.0.1:8888/?token=ebfc449f52d47aea7a98db8c7a323710cf615e98ee21bcfc) надо вставить в адресную строку браузера
-
-Должна появится подобная картинка:
-
-![Изображение Jupyter-ноутбука](assets/jupyter-notebook.png "Изображение Jupyter-ноутбука")
-
-Теперь достаточно кликнуть на папке work, чтобы увидеть содержимое корневой папки репозитория, включая доступные ноутбуки:
-
-![Изображение Jupyter-ноутбука](assets/jupyter-notebook-work.png "Изображение Jupyter-ноутбука")
-
-
-## Build
-
-```
-./docker-image.sh prod flask
-```
-
-## Test before deploy
-
-```
-docker rm flask && docker run -it --name flask -e PORT=9000 -p 4242:9000 bazawinner/prod-recommend-flask:7
-```
-
-## Deploy
-
-```
-sudo snap install heroku --classic
-heroku login
-heroku container:login
-mkdir ~/recommend_deploy
-cd ~/recommend_deploy
-heroku create
-```
-obscure-lowlands-91451
-
-```
-git init
-heroku git:remote -a obscure-lowlands-91451
-```
-
-```
-docker tag bazawinner/prod-recommend-flask:7 registry.heroku.com/obscure-lowlands-91451/web
-docker push registry.heroku.com/obscure-lowlands-91451/web
-heroku container:release web
-heroku open
-```

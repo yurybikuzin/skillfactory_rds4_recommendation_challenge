@@ -1,0 +1,137 @@
+.gallery {
+    --transition-time: 0.4s;
+
+    --zoom-size: 32px;
+    --zoom-offset-top: 16px;
+    --zoom-offset-right: 16px;
+
+    --counter-width: 64px;
+    --counter-height: 32px;
+    --counter-offset-right: 12px;
+    --counter-offset-bottom: 12px;
+    --counter-border-radius: 4px;
+    --counter-background-color: rgba(90, 90, 90, 0.8);
+    --counter-color: white;
+    --counter-font-family: sans-serif;
+    --counter-font-size: 14px;
+
+    --arrow-size: 64px;
+    --arrow-offset: 8px;
+    --arrow-icon-color: rgb(230,230,230, 0.8);
+    /* https://stackoverflow.com/questions/10768451/inline-svg-in-css: https://www.iconfinder.com/icons/383152/arrow_double_left_icon | https://jakearchibald.github.io/svgomg/  */
+    --arrow-left-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="100%" viewBox="0 0 26 26"><path d="M24 1l2 2-11 11 11 10-2 2-13-12z"/><path d="M13 1l2 2L4 14l11 10-2 2L0 14z"/></svg>');
+    /* https://stackoverflow.com/questions/10768451/inline-svg-in-css: https://www.iconfinder.com/icons/383079/arrow_double_right_icon | https://jakearchibald.github.io/svgomg/  */
+    --arrow-right-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" height="100%" width="100%" viewBox="0 0 26 26"><path d="M2 1L0 3l11 11L0 24l2 2 13-12z"/><path d="M13 1l-2 2 11 11-11 10 2 2 13-12z"/></svg>');
+
+    --zoom-background-color: black;
+    --zoom-in-icon-color: rgba(90, 90, 90, 0.8);
+    /* https://stackoverflow.com/questions/10768451/inline-svg-in-css: https://www.iconfinder.com/icons/383146/expand_icon | https://jakearchibald.github.io/svgomg/ */
+    --zoom-in-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 34 34"><path d="M23 15l2-3 2-2 2-2 4 3V1L23 2l4 3-3 2-2 3-2 2 2 3zM13 10l-3-3-2-2 4-3L1 1l1 10 3-3 3 2 2 2 2 3 3-3zM29 26l-2-2-2-2-2-2-1-1-2 3 2 3 2 2 3 2-4 4h10V23zM12 20l-2 2-2 2-3 2-3-3-1 10h11l-4-4 2-2 3-2 2-3-3-3z"/></svg>');
+    --zoom-out-icon-color: white;
+    /* https://stackoverflow.com/questions/10768451/inline-svg-in-css: https://www.iconfinder.com/icons/118665/exit_fullscreen_icon | https://jakearchibald.github.io/svgomg/ */
+    --zoom-out-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 32 32"><path d="M23 25l6 7 3-3-7-6 3-3h-8v8zM7 9l-3 3h8V4L9 7 3 0 0 3zM0 29l3 3 6-7 3 3v-8H4l3 3zM28 12l-3-3 7-6-3-3-6 7-3-3v8z"/></svg>');
+
+    position: relative;
+    overflow: hidden;
+}
+
+.gallery[data-z] {
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--zoom-background-color);
+    width: 100vw;
+    height: 100vh;
+}
+
+.gallery .main {
+    position: relative;
+    left: 0;
+    transition: left var(--transition-time);
+    display: flex;
+    align-items: center;
+    width: var(--wrapper-main-width);
+    height: 100%;
+}
+
+.gallery .main img {
+    width: var(--image-width);
+    height: 100%;
+    object-fit: cover;
+}
+.gallery[data-z] .main img {
+    object-fit: contain;
+}
+
+/* zoom */
+.gallery .zoom {
+    position: absolute;
+    width: var(--zoom-size);
+    height: var(--zoom-size);
+    top: var(--zoom-offset-top);
+    right: var(--zoom-offset-right);
+    /* https://codepen.io/noahblon/post/coloring-svgs-in-css-background-images */
+    background-color: var(--zoom-in-icon-color);
+    -webkit-mask-image: var(--zoom-in-icon);
+}
+
+/* zoom */
+.gallery[data-z] .zoom {
+    /* https://codepen.io/noahblon/post/coloring-svgs-in-css-background-images */
+    background-color: var(--zoom-out-icon-color);
+    -webkit-mask-image: var(--zoom-out-icon);
+}
+
+/* counter */
+.gallery .counter {
+    position: absolute;
+    right: var(--counter-offset-right);
+    bottom: 0;
+    /* bottom: var(--mini-height); */
+    width: var(--counter-width);
+    height: var(--counter-height);
+}
+
+.gallery .counter div {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    bottom: var(--counter-offset-bottom);
+    background-color: var(--counter-background-color);
+    border-radius: var(--counter-border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--counter-color);
+    font-family: var(--counter-font-family);
+    font-size: var(--counter-font-size);
+}
+
+.gallery .arrow {
+    position: relative;
+    top: -50%;
+    width: var(--arrow-size);
+    height: var(--arrow-size);
+    float: left;
+    margin-left: var(--arrow-offset);
+}
+
+.gallery .arrow.right {
+    float: right;
+    margin-right: var(--arrow-offset);
+}
+
+.gallery .arrow div {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: calc( -1 * (var(--arrow-size) + var(--mini-height)) / 2 );
+    /* https://codepen.io/noahblon/post/coloring-svgs-in-css-background-images */
+    background-color: var(--arrow-icon-color);
+    -webkit-mask-image: var(--arrow-left-icon);
+}
+
+.gallery .arrow.right div {
+    -webkit-mask-image: var(--arrow-right-icon);
+}

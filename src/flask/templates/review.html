@@ -1,0 +1,96 @@
+{% with item = filter.item %}
+<!doctype html>
+<html>
+
+<head>
+    {% include 'head.html' %}
+    <title>{% include 'title.html'%} :: Amazing.com: Grocery &amp; Gourmet Food</title>
+    <link rel="stylesheet" type="text/css" href="{{url_for('root.static', filename='review.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('root.static', filename='gallery.css')}}">
+    <style>
+.gallery {
+    --mini-height: 0;
+    --arrow-size: 32px;
+    --zoom-size: 44px;
+    --zoom-in-icon-color: white;
+    --zoom-offset-right: 8px;
+    --counter-offset-bottom: 8px;
+    --counter-height: 24px;
+    --counter-width: 32px;
+    --counter-width: 32px;
+    --counter-font-size: 12px;
+}
+    </style>
+    <script async defer src="{{url_for('root.static', filename='gallery.js')}}"></script>
+    {% include 'image_style.html' %}
+</head>
+
+<body>
+
+{% include 'header.html' %}
+
+<main>
+
+    <a class="back-to-item" href="/item/{{item.itemid}}{{filter.as_str(is_review=False)}}"><i></i>{% include 'title.html' %}</a>
+
+    <h1>Customer reviews</h1>
+
+    <ul>
+        {% for review in filter.list_review() %}
+        <li class="review">
+            <div class="reviewer" title="{{review.name}}">
+                <img 
+                    src="https://images-na.ssl-images-amazon.com/images/S/amazon-avatars-global/default._CR0,0,1024,1024_SX48_.png" 
+                >
+                <div class="reviewer_name">{{review.name}}</div>
+            </div>
+            <div class="overall">
+                <span class="stars" style="
+                    background-position: {{review.stars_pos}}px -368px;
+                "></span>
+                <span class="summary">{{review.summary}}</span>
+            </div>
+            <div class="time">Reviewed on {{review.time}}</div>
+            <div class="verified" data-verified="{{review.verified}}"></div>
+            <div class="text">{{review.text}}</div>
+            {% if review.vote is not none %}
+            <div class="vote">{{review.vote}} found this helpful</div>
+            {% endif %}
+            {% if review.list_image is not none %}
+                <div class="gallery" data-list-url='{{review.list_image|tojson}}'></div>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+        {% if not filter.is_bof_review() or not filter.is_eof_review() %}
+        <nav>
+            <a 
+                {% if filter.is_bof_review() %}
+                class="disabled"
+                {% else %}
+                href="{{url_for('root.item', itemid=item.itemid) + filter.as_str(start_review=filter.start_prev_review)}}"
+                {% endif %}
+            >← Previous</a>
+                <!-- href="/item/{{item.itemid}}{{filter.as_str(start_review=filter.start_prev_review)}}" -->
+            <a 
+                {% if filter.is_eof_review() %}
+                class="disabled"
+                {% else %}
+                href="{{url_for('root.item', itemid=item.itemid) + filter.as_str(start_review=filter.start_next_review)}}"
+                {% endif %}
+            >Next →</a>
+                <!-- href="/item/{{item.itemid}}{{filter.as_str(start_review=filter.start_next_review)}}" -->
+        </nav>
+        {% endif %}
+
+</main>
+
+
+<footer></footer>
+
+</body>
+
+</html>
+
+{% endwith %}

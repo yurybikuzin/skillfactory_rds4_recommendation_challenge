@@ -142,7 +142,7 @@ env "${envs[@]}" bash -c '
             sed -nE "s/^[[:space:]]*ARG[[:space:]]+([[:alnum:]_]+)([^=]|$)/--build-arg=\1/p"
         ) \
         -t $tag \
-        '"$target"'/'"$service"' && \
+        -f '"$target"'/'"$service"'/Dockerfile . && \
     echo OK: Built $tag && \
     if [[ ! "'"$build_only"'" ]] 
     then

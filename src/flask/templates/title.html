@@ -1,0 +1,5 @@
+{%- if item.title|length > 100 -%}
+    &lt;No title&gt; 
+{%- else -%}
+    {{- item.title -}}
+{%- endif -%}

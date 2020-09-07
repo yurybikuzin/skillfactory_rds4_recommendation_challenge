@@ -1,0 +1,12 @@
+<header>
+    <div class="logo-wrapper">
+        <a class="logo" href="{{url_for('root.index') + filter.as_str(is_cart=False, start_review=False)}}">
+            <div class="i">i</div>
+            <div class="i2">i</div>
+            <div class="apostrophi">'</div>
+        </a>
+    </div>
+    <a class="cart" href="{{url_for('root.index') + filter.as_str(is_cart=True)}}">
+        <div class="count">{{ filter.selected_list_cart_len() }}</div>
+    </a>
+</header>

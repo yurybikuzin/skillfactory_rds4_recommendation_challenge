@@ -1,0 +1,127 @@
+<!doctype html>
+<html>
+
+<head>
+    {% include 'head.html' %}
+{% if filter.is_cart %}
+    <title>Cart :: Amazing.com: Grocery &amp; Gourmet Food</title>
+    <style>
+        .empty { 
+            text-align: center; 
+            font-size: 22px;
+            font-weight: 700;
+        }
+    </style>
+{% else %}
+    <title>Amazing.com: Grocery &amp; Gourmet Food</title>
+    <script src="{{url_for('root.static', filename='filter.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{url_for('root.static', filename='filter.css')}}">
+{% endif %}
+{% include 'image_style.html' %}
+</head>
+
+<body>
+
+{% include 'header.html' %}
+
+{% if filter.is_cart %}
+<h1 class="padded">Your Cart at Groceries &amp; Gourmet Food</h1>
+{% else %}
+<h1 class="padded">Groceries &amp; Gourmet Food</h1>
+<div id="filter" data-state="closed">
+    <header class="padded">
+        <div>Found {{ filter.found() }} results</div> 
+
+        <label id="filter-button" onclick="applyFilter( '{{url_for('root.filter')}}', '{{url_for('root.index') + "?"}}' )">
+            <div>Filters</div>
+            {% if filter.count() > 0 %}
+                <div class="colored">({{filter.count()}})</div>
+            {% endif %}
+            <div class="icon-triangle down"></div>
+        </label>
+    </header>
+
+    <main>
+    </main>
+
+    <footer class="padded">
+        <label onclick="clearFilter()">Clear Filters</label>
+        <label onClick="applyFilter()">Done</label>
+    </footer>
+</div>
+{% endif %}
+
+<main>
+    {% if filter.list_item() is none %}
+        {% if filter.is_cart %}
+            <img src="{{url_for('root.static', filename='empty_cart.svg')}}"/>
+            <div class="empty">Your Cart is empty</div>
+        {% endif %}
+    {% else %}
+
+        <ul>
+        {% for item in filter.list_item() %}
+            <li class="item">
+                <a href="{{ url_for('root.item', itemid=item.itemid) + filter.as_str() }}">
+                    <div class="image-wrapper">
+
+                        {% include 'image.html' %}
+                    </div>
+                    <div class="content">
+
+                        <div class="title">{% include 'title.html' %}</div>
+
+                        <div class="overall">
+                            {% include 'stars.html' %}
+                        </div>
+
+                        {% if item.price is not none %}
+                            <div class="price">
+                                <span class="symbol">$</span>
+                                <span class="whole">{{ item.price_whole }}</span>
+                                <span class="fraction">{{ item.price_fraction }}</span>
+                            </div>
+                        {% endif %}
+                        {% if item.description|length > 1 %}
+                            {% if item.description|length < 100 %}
+                            <div class="description">{{item.description}}</div>
+                            {% else %}
+                            <div class="description to-be-continue" >{{item.description|truncate(100)}}</div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </a>
+            </li>
+        {% endfor %}
+        </ul>
+
+        {% if not filter.is_cart %}
+        {% if not filter.is_bof() or not filter.is_eof() %}
+        <nav>
+            <a 
+                {% if filter.is_bof() %}
+                class="disabled"
+                {% else %}
+                href="{{url_for('root.index') + filter.as_str(start=filter.start_prev)}}"
+                {% endif %}
+            >← Previous</a>
+            <a 
+                {% if filter.is_eof() %}
+                class="disabled"
+                {% else %}
+                href="{{url_for('root.index') + filter.as_str(start=filter.start_next)}}"
+                {% endif %}
+            >Next →</a>
+        </nav>
+        {% endif %}
+        {% endif %}
+
+    {% endif %}
+</main>
+
+<footer></footer>
+
+</body>
+
+</html>
+

@@ -1,0 +1,6 @@
+uwsgi
+Flask
+Jinja2
+Werkzeug
+pysqlite3
+nmslib

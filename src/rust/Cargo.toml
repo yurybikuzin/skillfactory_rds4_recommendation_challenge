@@ -1,6 +1,7 @@
 [workspace]
-default-members = [ "provide" ]
+default-members = [ "parse", "db" ]
 members = [ 
-    "provide",
+    "parse",
+    "db",
 ]
 

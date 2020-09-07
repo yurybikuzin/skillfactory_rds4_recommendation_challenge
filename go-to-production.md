@@ -32,7 +32,7 @@
 Лучшим вариантом знакомства с production-сервисом будет разворачиваине его на локальной машине следующей командой:
 
 ```
-docker rm recommend; docker run -it --name recommend -e PORT=9000 -p 42420:9000 bazawinner/prod-recommend-flask:7
+docker rm recommend; docker run -it --name recommend -e PORT=9000 -p 42420:9000 bazawinner/prod-recommend-flask:9
 ```
 
 Результат можно увидеть в браузере: http://localhost:42420
@@ -49,7 +49,7 @@ heroku create # команда вернула evening-badlands-35661
 export heroku_app=evening-badlands-35661
 git init
 heroku git:remote -a $heroku_app
-docker tag bazawinner/prod-recommend-flask:7 registry.heroku.com/$heroku_app/web
+docker tag bazawinner/prod-recommend-flask:9 registry.heroku.com/$heroku_app/web
 docker push registry.heroku.com/$heroku_app/web
 heroku container:release web
 heroku open

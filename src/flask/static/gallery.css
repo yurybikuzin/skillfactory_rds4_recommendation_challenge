@@ -1,9 +1,6 @@
 .gallery {
     --transition-time: 0.4s;
 
-    --mini-height: 52px;
-    --mini-width: 78px;
-
     --zoom-size: 32px;
     --zoom-offset-top: 16px;
     --zoom-offset-right: 16px;
@@ -32,11 +29,10 @@
     --zoom-in-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 34 34"><path d="M23 15l2-3 2-2 2-2 4 3V1L23 2l4 3-3 2-2 3-2 2 2 3zM13 10l-3-3-2-2 4-3L1 1l1 10 3-3 3 2 2 2 2 3 3-3zM29 26l-2-2-2-2-2-2-1-1-2 3 2 3 2 2 3 2-4 4h10V23zM12 20l-2 2-2 2-3 2-3-3-1 10h11l-4-4 2-2 3-2 2-3-3-3z"/></svg>');
     --zoom-out-icon-color: white;
     /* https://stackoverflow.com/questions/10768451/inline-svg-in-css: https://www.iconfinder.com/icons/118665/exit_fullscreen_icon | https://jakearchibald.github.io/svgomg/ */
-    --zoom-out-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><path d="M23 25l6 7 3-3-7-6 3-3h-8v8zM7 9l-3 3h8V4L9 7 3 0 0 3zM0 29l3 3 6-7 3 3v-8H4l3 3zM28 12l-3-3 7-6-3-3-6 7-3-3v8z"/></svg>');
+    --zoom-out-icon: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 32 32"><path d="M23 25l6 7 3-3-7-6 3-3h-8v8zM7 9l-3 3h8V4L9 7 3 0 0 3zM0 29l3 3 6-7 3 3v-8H4l3 3zM28 12l-3-3 7-6-3-3-6 7-3-3v8z"/></svg>');
 
     position: relative;
     overflow: hidden;
-    min-height: calc( 3 * var(--mini-height) );
 }
 
 .gallery[data-z] {
@@ -56,16 +52,7 @@
     display: flex;
     align-items: center;
     width: var(--wrapper-main-width);
-    height: calc(100% - var(--mini-height));
-}
-.gallery .mini {
-    position: relative;
-    left: 0;
-    display: flex;
-    width: var(--wrapper-mini-width);
-    transition: left var(--transition-time);
-    height: var(--mini-height);
-    background-color: white;
+    height: 100%;
 }
 
 .gallery .main img {
@@ -75,17 +62,6 @@
 }
 .gallery[data-z] .main img {
     object-fit: contain;
-}
-
-.gallery .mini img {
-    width: var(--mini-width);
-    height: 100%;
-    object-fit: cover;
-    margin-left: 2px;
-    margin-right: 2px;
-    cursor: pointer;
-    border: 1px solid rgb(150,150,150);
-    box-sizing: border-box;
 }
 
 /* zoom */
@@ -111,7 +87,8 @@
 .gallery .counter {
     position: absolute;
     right: var(--counter-offset-right);
-    bottom: var(--mini-height);
+    bottom: 0;
+    /* bottom: var(--mini-height); */
     width: var(--counter-width);
     height: var(--counter-height);
 }

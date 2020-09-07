@@ -22,7 +22,7 @@
 ## Деплой 
 
 Деплой производился дважды:
-- на [heroku.com](https://heroku.com): https://obscure-lowlands-91451.herokuapp.com/ 
+- на [heroku.com](https://heroku.com): https://evening-badlands-35661.herokuapp.com/ 
 - и на собственный сервер: http://bikuzin18.baza-winner.ru:42420/
 
 После деплоя на [heroku.com](https://heroku.com) выяснилось, что ресурсов (в первую очередь памяти - 512MB), предоставляемых [heroku.com](https://heroku.com) в бесплатном режиме, недостаточно для работы сервиса (а именно для работы с базой данных, только файл `flask.db` которой занимает 541MB. Поэтому, когда на сервер приходят запросы, связанные с фильтрацией/сортировкой, то время обработка таких запросов часто превышает время ожидания http-сервера `heroku`, и пользователь вместо ответа получает ошибку приложения на сервере)
@@ -45,11 +45,12 @@ heroku login
 heroku container:login
 mkdir ~/recommend_deploy
 cd ~/recommend_deploy
-heroku create # команда вернула obscure-lowlands-91451
+heroku create # команда вернула evening-badlands-35661
+export heroku_app=evening-badlands-35661
 git init
-heroku git:remote -a obscure-lowlands-91451
-docker tag bazawinner/prod-recommend-flask:7 registry.heroku.com/obscure-lowlands-91451/web
-docker push registry.heroku.com/obscure-lowlands-91451/web
+heroku git:remote -a $heroku_app
+docker tag bazawinner/prod-recommend-flask:7 registry.heroku.com/$heroku_app/web
+docker push registry.heroku.com/$heroku_app/web
 heroku container:release web
 heroku open
 ```
@@ -62,6 +63,6 @@ heroku open
 
 ```
 ssh bikuzin18
-docker rm recommend; docker run -it --name recommend -e PORT=9000 -p 42420:9000 bazawinner/prod-recommend-flask:7
+docker rm recommend; docker run -it --name recommend -e PORT=9000 -p 42420:9000 bazawinner/prod-recommend-flask:9
 ```
 

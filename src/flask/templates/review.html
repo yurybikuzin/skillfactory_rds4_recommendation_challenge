@@ -7,6 +7,20 @@
     <title>{% include 'title.html'%} :: Amazing.com: Grocery &amp; Gourmet Food</title>
     <link rel="stylesheet" type="text/css" href="{{url_for('root.static', filename='review.css')}}">
     <link rel="stylesheet" type="text/css" href="{{url_for('root.static', filename='gallery.css')}}">
+    <style>
+.gallery {
+    --mini-height: 0;
+    --arrow-size: 32px;
+    --zoom-size: 44px;
+    --zoom-in-icon-color: white;
+    --zoom-offset-right: 8px;
+    --counter-offset-bottom: 8px;
+    --counter-height: 24px;
+    --counter-width: 32px;
+    --counter-width: 32px;
+    --counter-font-size: 12px;
+}
+    </style>
     <script async defer src="{{url_for('root.static', filename='gallery.js')}}"></script>
     {% include 'image_style.html' %}
 </head>

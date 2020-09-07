@@ -76,7 +76,6 @@ class Filter:
             self._selected_start = 0
         self.start_prev = self._selected_start - self._per_page
         self.start_next = self._selected_start + self._per_page
-        # print(self.start_prev, self._selected_start, self._per_page)
 
         self._selected_start_review = request.args.get('start_review')
         if self._selected_start_review is not None:
@@ -156,7 +155,6 @@ class Filter:
                 nms_idx_loaded.loadIndex('data/nms.idx', False)
                 itemid = self.item["itemid"]
                 nbm = builtins.filter(lambda a: a != itemid, nms_idx_loaded.knnQuery(item_embeddings[int(itemid)], k=11)[0])
-                print(itemid, nbm)
                 self._list_item = list_item(",".join(map(lambda a: str(a), nbm)))
             elif self.is_cart:
                 if len(self._selected_list_cart) > 0:
@@ -292,7 +290,6 @@ class Filter:
             params.append( f"is_review=1")
         if start is not None and start != 0:
             params.append( f"start={start}")
-        print(start, params)
         if start_review is not None and start_review != 0:
             params.append( f"start_review={start_review}")
         if sort is not None and sort != "":
@@ -309,7 +306,6 @@ class Filter:
             result = ""
         else:
             result = "?" + "&".join(params)
-        print(result)
         return result
     def with_item_in_cart(self, id):
         if self._selected_list_cart_as_str is None:

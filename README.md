@@ -15,7 +15,8 @@
 * [Структура репозитория](#структура-репозитория)
 
 <!-- vim-markdown-toc -->
-Состав команды: Yury Bikuzin, Sophia Zamoreeva, Den Volkov, Max 
+Состав команды: Yury Bikuzin, Sophia Zamoreeva, Den Volkov, Shuler
+Отчетный ноутбук можно посмотреть по ссылке: https://github.com/yurybikuzin/skillfactory_rds4_recommendation_challenge/blob/master/main.ipynb
 
 ## Задача
 

@@ -15,7 +15,7 @@
 * [Структура репозитория](#структура-репозитория)
 
 <!-- vim-markdown-toc -->
-Состав команды: Yury Bikuzin, Sophia Zamoreeva, Den Volkov, Shuler
+Состав команды: Yury Bikuzin, Sophia Zamoreeva, Den Volkov, Shuler. Название команды на kaggle.com: TWAS (together we are strong).
 
 Отчетный ноутбук можно посмотреть по ссылке: https://github.com/yurybikuzin/skillfactory_rds4_recommendation_challenge/blob/master/main.ipynb
 

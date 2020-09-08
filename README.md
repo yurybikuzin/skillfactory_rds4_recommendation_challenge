@@ -15,7 +15,7 @@
 * [Структура репозитория](#структура-репозитория)
 
 <!-- vim-markdown-toc -->
-
+Состав команды: Yury Bikuzin, Sophia Zamoreeva, Den Volkov, Max 
 
 ## Задача
 

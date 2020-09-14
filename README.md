@@ -1,5 +1,5 @@
 ![Title PNG "Skill Factory"](/assets/skillfactory_logo.png)
-# Проект №4. Рекомендательные системы
+# Проект №5. Рекомендательные системы
 
 <!-- vim-markdown-toc Redcarpet -->
 
@@ -15,9 +15,12 @@
 * [Структура репозитория](#структура-репозитория)
 
 <!-- vim-markdown-toc -->
-Состав команды: Yury Bikuzin, Sophia Zamoreeva, Den Volkov, Shuler. Название команды на kaggle.com: TWAS (together we are strong).
 
-Отчетный ноутбук можно посмотреть по ссылке: https://github.com/yurybikuzin/skillfactory_rds4_recommendation_challenge/blob/master/main.ipynb
+Состав команды: [Sophia Zamoreeva](https://sfdatasciencecourse.slack.com/archives/D0187AWUYFQ), [Denis Volkov](https://sfdatasciencecourse.slack.com/archives/D01751QRQDR), [Shuler](https://sfdatasciencecourse.slack.com/archives/D017GFWS42V), [yury bikuzin](https://sfdatasciencecourse.slack.com/archives/D017E787B7S). 
+
+Название команды на kaggle.com: TWAS (together we are strong).
+
+[Отчетный ноутбук](main.ipynb)
 
 ## Задача
 

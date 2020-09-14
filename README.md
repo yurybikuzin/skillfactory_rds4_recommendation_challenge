@@ -20,7 +20,7 @@
 
 Название команды на kaggle.com: TWAS (together we are strong).
 
-Отчетный ноутбук можно посмотреть по ссылке: https://github.com/yurybikuzin/skillfactory_rds4_recommendation_challenge/blob/master/main.ipynb
+[Отчетный ноутбук](main.ipynb)
 
 ## Задача
 

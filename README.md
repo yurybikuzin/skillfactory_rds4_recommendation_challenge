@@ -33,13 +33,13 @@ https://www.kaggle.com/c/recommendationsv4/overview
 
 #### На heroku.com
 
-https://evening-badlands-35661.herokuapp.com/
+https://evening-badlands-35661.herokuapp.com/amazing/
 
 Некоторые страницы могут не отображаться из-за низкой производительности сервера
 
 #### На собственном сервере
 
-http://bikuzin18.baza-winner.ru:42420/ 
+http://bikuzin18.baza-winner.ru:42420/amazing/ 
 
 Работает стабильнее, чем на heroku, если, конечно, сервис не выключен на собственном сервере
 
@@ -51,7 +51,7 @@ http://bikuzin18.baza-winner.ru:42420/
 docker rm recommend; docker run -it --name recommend -e PORT=9000 -p 42420:9000 bazawinner/prod-recommend-flask:9
 ```
 
-Результат можно увидеть в браузере: http://localhost:42420
+Результат можно увидеть в браузере: http://localhost:42420/amazing
 
 ### Описание
 

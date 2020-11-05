@@ -51,7 +51,7 @@ http://bikuzin18.baza-winner.ru:42420/amazing/
 docker rm recommend; docker run -it --name recommend -e PORT=9000 -p 42420:9000 bazawinner/prod-recommend-flask:9
 ```
 
-Результат можно увидеть в браузере: http://localhost:42420/amazing
+Результат можно увидеть в браузере: http://localhost:42420/
 
 ### Описание
 

@@ -33,7 +33,7 @@ https://www.kaggle.com/c/recommendationsv4/overview
 
 #### На heroku.com
 
-https://evening-badlands-35661.herokuapp.com/amazing/
+https://evening-badlands-35661.herokuapp.com/
 
 Некоторые страницы могут не отображаться из-за низкой производительности сервера
 

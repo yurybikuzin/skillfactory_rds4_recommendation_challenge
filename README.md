@@ -1,5 +1,5 @@
 ![Title PNG "Skill Factory"](/assets/skillfactory_logo.png)
-# Проект №4. Рекомендательные системы
+# Проект №5. Рекомендательные системы
 
 <!-- vim-markdown-toc Redcarpet -->
 
@@ -16,6 +16,11 @@
 
 <!-- vim-markdown-toc -->
 
+Состав команды: [Sophia Zamoreeva](https://sfdatasciencecourse.slack.com/archives/D0187AWUYFQ), [Denis Volkov](https://sfdatasciencecourse.slack.com/archives/D01751QRQDR), [Shuler](https://sfdatasciencecourse.slack.com/archives/D017GFWS42V), [yury bikuzin](https://sfdatasciencecourse.slack.com/archives/D017E787B7S). 
+
+Название команды на kaggle.com: TWAS (together we are strong).
+
+[Отчетный ноутбук](main.ipynb)
 
 ## Задача
 
@@ -34,7 +39,7 @@ https://evening-badlands-35661.herokuapp.com/
 
 #### На собственном сервере
 
-http://bikuzin18.baza-winner.ru:42420/ 
+http://bikuzin18.baza-winner.ru:42420/amazing/ 
 
 Работает стабильнее, чем на heroku, если, конечно, сервис не выключен на собственном сервере
 
@@ -46,7 +51,7 @@ http://bikuzin18.baza-winner.ru:42420/
 docker rm recommend; docker run -it --name recommend -e PORT=9000 -p 42420:9000 bazawinner/prod-recommend-flask:9
 ```
 
-Результат можно увидеть в браузере: http://localhost:42420
+Результат можно увидеть в браузере: http://localhost:42420/
 
 ### Описание
 

@@ -50,6 +50,7 @@ export heroku_app=evening-badlands-35661
 git init
 heroku git:remote -a $heroku_app
 docker tag bazawinner/prod-recommend-flask:9 registry.heroku.com/$heroku_app/web
+heroku container:login
 docker push registry.heroku.com/$heroku_app/web
 heroku container:release web
 heroku open
